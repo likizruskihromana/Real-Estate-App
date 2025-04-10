@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="bs-BA">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Vijesti</title>
+        <link rel="stylesheet" href="../style/vijesti.css">
+    </head>
+    <body>
+        <iframe src="meni.html"></iframe>
+
+        <div class="vijesti">
+            <div class="glavnaVijest">
+                <div class="naslov">Dantzig’s Simplex Algorithm</div>
+                <div class="text">The name of the algorithm is derived from the concept of a simplex and was suggested by T. S. Motzkin.[2]</div>
+                <img src="../Slike/main_news.webp" alt="Slika">
+            </div>
+            <div class="visokaVijest">
+                <div class="naslov">History</div>
+                <div class="text">George Dantzig worked on planning methods for the US Army Air Force during World War II using a desk calculator. During 1946, his colleague challenged him to mechanize the planning process to distract him from taking another job.</div>
+            </div>
+            <div class="kvadratnaVijest">
+                <div class="naslov">Overview</div>
+                <div class="text">It can be shown that for a linear program in standard form, if the objective function has a maximum value on the feasible region, then it has this value on (at least) one of the extreme points.[10] This in itself reduces the problem to a finite computation since there is a finite number of extreme points, but the number of extreme points is unmanageably large for all but the smallest linear programs.</div>
+            </div>
+            <div class="kvadratnaVijest">
+                <div class="naslov">Standard form</div>
+                <div class="text">The transformation of a linear program to one in standard form may be accomplished as follows.[16] First, for each variable with a lower bound other than 0, a new variable is introduced representing the difference between the variable and bound. The original variable can then be eliminated by substitution.</div>
+            </div>
+            <div class="visokaVijest">
+                <div class="naslov">Simplex tableau</div>
+                <div class="text">he first row defines the objective function and the remaining rows specify the constraints. The zero in the first column represents the zero vector of the same dimension as the vector 
+                    b
+                    {\displaystyle \mathbf {b} } (different authors use different conventions as to the exact layout). If the columns of 
+                    A
+                    {\displaystyle \mathbf {A} } can be rearranged so that it contains the identity matrix of order 
+                    p
+                    {\displaystyle p} (the number of rows in 
+                    A
+                    {\displaystyle \mathbf {A} }) then the tableau is said to be in canonical form.[18] The variables corresponding to the columns of the identity matrix are called basic variables while the remaining variables are called nonbasic or free variables. If the values of the nonbasic variables are set to 0, then the values of the basic variables are easily obtained as entries in 
+                    b
+                    {\displaystyle \mathbf {b} } and this solution is a basic feasible solution. The algebraic interpretation here is that the coefficients of the linear equation represented by each row are either 
+                    0
+                    {\displaystyle 0}, 
+                    1
+                    {\displaystyle 1}, or some other number. Each row will have 
+                    1
+                    {\displaystyle 1} column with value 
+                    1
+                    {\displaystyle 1}, 
+                    p
+                    −
+                    1
+                    {\displaystyle p-1} columns with coefficients 
+                    0
+                    {\displaystyle 0}, and the remaining columns with some other coefficients (these other variables represent our non-basic variables). By setting the values of the non-basic variables to zero we ensure in each row that the value of the variable represented by a 
+                    1
+                    {\displaystyle 1} in its column is equal to the 
+                    b
+                    {\displaystyle b} value at that row.</div>
+                </div>
+            <div class="kvadratnaVijest">
+                <div class="naslov">Pivot operations</div>
+                <div class="text">Let a linear program be given by a canonical tableau. The simplex algorithm proceeds by performing successive pivot operations each of which give an improved basic feasible solution; the choice of pivot element at each step is largely determined by the requirement that this pivot improves the solution.</div>
+            </div>
+            <div class="kvadratnaVijest">
+                <div class="naslov">Algorithm</div>
+                <div class="text">The geometrical operation of moving from a basic feasible solution to an adjacent basic feasible solution is implemented as a pivot operation. First, a nonzero pivot element is selected in a nonbasic column. The row containing this element is multiplied by its reciprocal to change this element to 1, and then multiples of the row are added to the other rows to change the other entries in the column to 0. The result is that, if the pivot element is in a row r, then the column becomes the r-th column of the identity matrix.</div>
+            </div>
+            <div class="kvadratnaVijest">
+                <div class="naslov">Entering variable selection</div>
+                <div class="text">Since the entering variable will, in general, increase from 0 to a positive number, the value of the objective function will decrease if the derivative of the objective function with respect to this variable is negative. Equivalently, the value of the objective function is increased if the pivot column is selected so that the corresponding entry in the objective row of the tableau is positive.</div>
+            </div>
+            <div class="kvadratnaVijest">
+                <div class="naslov">Leaving variable selection</div>
+                <div class="text">Once the pivot column has been selected, the choice of pivot row is largely determined by the requirement that the resulting solution be feasible. First, only positive entries in the pivot column are considered since this guarantees that the value of the entering variable will be nonnegative. If there are no positive entries in the pivot column then the entering variable can take any non-negative value with the solution remaining feasible.</div>
+            </div>
+            <div class="visokaVijest">
+                <div class="naslov">Finding an initial canonical tableau</div>
+                <div class="text">In general, a linear program will not be given in the canonical form and an equivalent canonical tableau must be found before the simplex algorithm can start. This can be accomplished by the introduction of artificial variables. Columns of the identity matrix are added as column vectors for these variables. If the b value for a constraint equation is negative, the equation is negated before adding the identity matrix columns. This does not change the set of feasible solutions or the optimal solution, and it ensures that the slack variables will constitute an initial feasible solution. The new tableau is in canonical form but it is not equivalent to the original problem. So a new objective function, equal to the sum of the artificial variables, is introduced and the simplex algorithm is applied to find the minimum; the modified linear program is called the Phase I problem.</div>
+            </div>
+            <div class="visokaVijest">
+                <div class="naslov">DEGENERACY: stalling and cycling</div>
+                <div class="text">If the values of all basic variables are strictly positive, then a pivot must result in an improvement in the objective value. When this is always the case no set of basic variables occurs twice and the simplex algorithm must terminate after a finite number of steps. Basic feasible solutions where at least one of the basic variables is zero are called degenerate and may result in pivots for which there is no improvement in the objective value. In this case there is no actual change in the solution but only a change in the set of basic variables. When several such pivots occur in succession, there is no improvement; in large industrial applications, degeneracy is common and such "stalling" is notable. Worse than stalling is the possibility the same set of basic variables occurs twice, in which case, the deterministic pivoting rules of the simplex algorithm will produce an infinite loop, or "cycle". While degeneracy is the rule in practice and stalling is common, cycling is rare in practice. A discussion of an example of practical cycling occurs in Padberg.[24] Bland's rule prevents cycling and thus guarantees that the simplex algorithm always terminates.[24][29][30] Another pivoting algorithm, the criss-cross algorithm never cycles on linear programs.</div>
+            </div>
+            <div class="kvadratnaVijest">
+                <div class="naslov">Efficiency in the worst case</div>
+                <div class="text">The simplex method is remarkably efficient in practice and was a great improvement over earlier methods such as Fourier–Motzkin elimination. However, in 1972, Klee and Minty[32] gave an example, the Klee–Minty cube, showing that the worst-case complexity of simplex method as formulated by Dantzig is exponential time.</div>
+            </div>
+            <div class="kvadratnaVijest">
+                <div class="naslov">Efficiency in practice</div>
+                <div class="text">Analyzing and quantifying the observation that the simplex algorithm is efficient in practice despite its exponential worst-case complexity has led to the development of other measures of complexity. The simplex algorithm has polynomial-time average-case complexity under various probability distributions, with the precise average-case performance of the simplex algorithm depending on the choice of a probability distribution for the random matrices.</div>
+            </div>
+        </div>
+
+
+
+        <div class="vijesti1">
+            <div class="glavnaVijest">
+                <div class="naslov">Dantzig’s Simplex Algorithm</div>
+                <div class="text">The name of the algorithm is derived from the concept of a simplex and was suggested by T. S. Motzkin.[2]</div>
+                <img src="../Slike/main_news.webp" alt="Slika">
+            </div>
+            <div class="visokaVijest">
+                <div class="naslov">History</div>
+                <div class="text">George Dantzig worked on planning methods for the US Army Air Force during World War II using a desk calculator. During 1946, his colleague challenged him to mechanize the planning process to distract him from taking another job.</div>
+            </div>
+            <div class="kvadratnaVijest">
+                <div class="naslov">Overview</div>
+                <div class="text">It can be shown that for a linear program in standard form, if the objective function has a maximum value on the feasible region, then it has this value on (at least) one of the extreme points.[10] This in itself reduces the problem to a finite computation since there is a finite number of extreme points, but the number of extreme points is unmanageably large for all but the smallest linear programs.</div>
+            </div>
+            <div class="kvadratnaVijest">
+                <div class="naslov">Standard form</div>
+                <div class="text">The transformation of a linear program to one in standard form may be accomplished as follows.[16] First, for each variable with a lower bound other than 0, a new variable is introduced representing the difference between the variable and bound. The original variable can then be eliminated by substitution.</div>
+            </div>
+            <div class="kvadratnaVijest">
+                <div class="naslov">Pivot operations</div>
+                <div class="text">Let a linear program be given by a canonical tableau. The simplex algorithm proceeds by performing successive pivot operations each of which give an improved basic feasible solution; the choice of pivot element at each step is largely determined by the requirement that this pivot improves the solution.</div>
+            </div>
+            <div class="visokaVijest">
+                <div class="naslov">Simplex tableau</div>
+                <div class="text">he first row defines the objective function and the remaining rows specify the constraints. The zero in the first column represents the zero vector of the same dimension as the vector 
+                    b
+                    {\displaystyle \mathbf {b} } (different authors use different conventions as to the exact layout). If the columns of 
+                    A
+                    {\displaystyle \mathbf {A} } can be rearranged so that it contains the identity matrix of order 
+                    p
+                    {\displaystyle p} (the number of rows in 
+                    A
+                    {\displaystyle \mathbf {A} }) then the tableau is said to be in canonical form.[18] The variables corresponding to the columns of the identity matrix are called basic variables while the remaining variables are called nonbasic or free variables. If the values of the nonbasic variables are set to 0, then the values of the basic variables are easily obtained as entries in 
+                    b
+                    {\displaystyle \mathbf {b} } and this solution is a basic feasible solution. The algebraic interpretation here is that the coefficients of the linear equation represented by each row are either 
+                    0
+                    {\displaystyle 0}, 
+                    1
+                    {\displaystyle 1}, or some other number. Each row will have 
+                    1
+                    {\displaystyle 1} column with value 
+                    1
+                    {\displaystyle 1}, 
+                    p
+                    −
+                    1
+                    {\displaystyle p-1} columns with coefficients 
+                    0
+                    {\displaystyle 0}, and the remaining columns with some other coefficients (these other variables represent our non-basic variables). By setting the values of the non-basic variables to zero we ensure in each row that the value of the variable represented by a 
+                    1
+                    {\displaystyle 1} in its column is equal to the 
+                    b
+                    {\displaystyle b} value at that row.</div>
+                </div>
+                <div class="kvadratnaVijest">
+                    <div class="naslov">Algorithm</div>
+                    <div class="text">The geometrical operation of moving from a basic feasible solution to an adjacent basic feasible solution is implemented as a pivot operation. First, a nonzero pivot element is selected in a nonbasic column. The row containing this element is multiplied by its reciprocal to change this element to 1, and then multiples of the row are added to the other rows to change the other entries in the column to 0. The result is that, if the pivot element is in a row r, then the column becomes the r-th column of the identity matrix.</div>
+                </div>
+
+                <div class="kvadratnaVijest">
+                    <div class="naslov">Entering variable selection</div>
+                    <div class="text">Since the entering variable will, in general, increase from 0 to a positive number, the value of the objective function will decrease if the derivative of the objective function with respect to this variable is negative. Equivalently, the value of the objective function is increased if the pivot column is selected so that the corresponding entry in the objective row of the tableau is positive.</div>
+                </div>
+                <div class="kvadratnaVijest">
+                    <div class="naslov">Leaving variable selection</div>
+                    <div class="text">Once the pivot column has been selected, the choice of pivot row is largely determined by the requirement that the resulting solution be feasible. First, only positive entries in the pivot column are considered since this guarantees that the value of the entering variable will be nonnegative. If there are no positive entries in the pivot column then the entering variable can take any non-negative value with the solution remaining feasible.</div>
+                </div>
+            <div class="kvadratnaVijest">
+                <div class="naslov">Efficiency in the worst case</div>
+                <div class="text">The simplex method is remarkably efficient in practice and was a great improvement over earlier methods such as Fourier–Motzkin elimination. However, in 1972, Klee and Minty[32] gave an example, the Klee–Minty cube, showing that the worst-case complexity of simplex method as formulated by Dantzig is exponential time.</div>
+            </div>
+            <div class="kvadratnaVijest">
+                <div class="naslov">Efficiency in practice</div>
+                <div class="text">Analyzing and quantifying the observation that the simplex algorithm is efficient in practice despite its exponential worst-case complexity has led to the development of other measures of complexity. The simplex algorithm has polynomial-time average-case complexity under various probability distributions, with the precise average-case performance of the simplex algorithm depending on the choice of a probability distribution for the random matrices.</div>
+            </div>
+            <div class="visokaVijest">
+                <div class="naslov">Finding an initial canonical tableau</div>
+                <div class="text">In general, a linear program will not be given in the canonical form and an equivalent canonical tableau must be found before the simplex algorithm can start. This can be accomplished by the introduction of artificial variables. Columns of the identity matrix are added as column vectors for these variables. If the b value for a constraint equation is negative, the equation is negated before adding the identity matrix columns. This does not change the set of feasible solutions or the optimal solution, and it ensures that the slack variables will constitute an initial feasible solution. The new tableau is in canonical form but it is not equivalent to the original problem. So a new objective function, equal to the sum of the artificial variables, is introduced and the simplex algorithm is applied to find the minimum; the modified linear program is called the Phase I problem.</div>
+            </div>
+            <div class="visokaVijest">
+                <div class="naslov">DEGENERACY: stalling and cycling</div>
+                <div class="text">If the values of all basic variables are strictly positive, then a pivot must result in an improvement in the objective value. When this is always the case no set of basic variables occurs twice and the simplex algorithm must terminate after a finite number of steps. Basic feasible solutions where at least one of the basic variables is zero are called degenerate and may result in pivots for which there is no improvement in the objective value. In this case there is no actual change in the solution but only a change in the set of basic variables. When several such pivots occur in succession, there is no improvement; in large industrial applications, degeneracy is common and such "stalling" is notable. Worse than stalling is the possibility the same set of basic variables occurs twice, in which case, the deterministic pivoting rules of the simplex algorithm will produce an infinite loop, or "cycle". While degeneracy is the rule in practice and stalling is common, cycling is rare in practice. A discussion of an example of practical cycling occurs in Padberg.[24] Bland's rule prevents cycling and thus guarantees that the simplex algorithm always terminates.[24][29][30] Another pivoting algorithm, the criss-cross algorithm never cycles on linear programs.</div>
+            </div>
+        </div>
+    </body>
+</html>
