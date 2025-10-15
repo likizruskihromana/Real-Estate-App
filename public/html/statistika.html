@@ -1,97 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bs-BA">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Statistika Nekretnina</title>
+    <title>Statistika</title>
+    <link rel="stylesheet" href="../style/statistika.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../scripts/SpisakNekretnina.js"></script>
-    <script src="../scripts/StatistikaNekretnina.js"></script>
-    <script defer src="../scripts/statistika.js"></script>
-    <link rel="stylesheet" type="text/css" href="../style/statistika.css">
-
-
 </head>
 <body>
-    <iframe src="meni.html">meni</iframe>
+    <iframe src="meni.html"></iframe>
 
-    <h1>Statistika Nekretnina</h1>
-    <section id="form-section">
-        <h2>Unesite vremenske periode i raspone cijena</h2>
-        <div id="period-inputs">
-            <label>Dodajte period:</label>
-            <input type="number" placeholder="Od godine" id="period-od">
-            <input type="number" placeholder="Do godine" id="period-do">
-            <button id="dodaj-period">Dodaj period</button>
-        </div>
+    <div class="container">
+        <h1>Statistika Nekretnina</h1>
+        
+        <section id="filter-section">
+            <h2>Filtrirajte nekretnine</h2>
+            <div class="filter-grid">
+                <input type="text" id="filter-tip-nekretnine" placeholder="Tip nekretnine">
+                <input type="number" id="filter-min-kvadratura" placeholder="Min kvadratura">
+                <input type="number" id="filter-max-kvadratura" placeholder="Max kvadratura">
+                <input type="number" id="filter-min-cijena" placeholder="Min cijena">
+                <input type="number" id="filter-max-cijena" placeholder="Max cijena">
+                <input type="text" id="filter-lokacija" placeholder="Lokacija">
+                <button id="primijeni-filter">Primijeni Filter</button>
+            </div>
+        </section>
 
-        <div id="cijena-inputs">
-            <label>Dodajte raspon cijena:</label>
-            <input type="number" placeholder="Od cijene" id="cijena-od">
-            <input type="number" placeholder="Do cijene" id="cijena-do">
-            <button id="dodaj-raspon">Dodaj raspon</button>
-        </div>
+        <section id="histogram-section">
+            <h2>Histogram Cijena</h2>
+            <div class="period-inputs">
+                <input type="number" id="period-od" placeholder="Od godine">
+                <input type="number" id="period-do" placeholder="Do godine">
+                <button id="dodaj-period">Dodaj Period</button>
+            </div>
+            <div class="cijena-inputs">
+                <input type="number" id="cijena-od" placeholder="Od cijene">
+                <input type="number" id="cijena-do" placeholder="Do cijene">
+                <button id="dodaj-raspon">Dodaj Raspon</button>
+            </div>
+            <button id="iscrtaj-histogram">Iscrtaj Histogram</button>
+            <div id="histogram-charts"></div>
+        </section>
 
-        <button id="iscrtaj-histogram">Iscrtaj Histogram</button>
-
-    <section id="results-section">
-        <h2>Rezultati</h2>
-        <div id="histogram-charts"></div>
-        <div id="ostale-funkcije">
-            <h3>Ostale funkcije:</h3>
-            <p>Prosječna kvadratura: <span id="prosjek-kvadratura"></span></p>
-            <p>Outlier: <span id="outlier"></span></p>
-            <p>Moje nekretnine: <span id="moje-nekretnine"></span></p>
-        </div>
-    </section>
-</section>
-<section id="filter-section">
-    <h2>Filtrirajte nekretnine</h2>
-    <div id="filter-inputs">
-        <div class="inputs">
-            <label>Tip nekretnine:</label>
-            <input type="text" id="filter-tip-nekretnine" placeholder="Stan, Kuća, Poslovni prostor">
-        </div>
-
-        <div class="inputs">
-            <label>Minimalna kvadratura:</label>
-            <input type="number" id="filter-min-kvadratura" placeholder="Unesite min kvadraturu">
-        </div>
-
-        <div class="inputs">
-            <label>Maksimalna kvadratura:</label>
-            <input type="number" id="filter-max-kvadratura" placeholder="Unesite max kvadraturu">
-        </div>
-
-        <div class="inputs">
-            <label>Minimalna cijena:</label>
-            <input type="number" id="filter-min-cijena" placeholder="Unesite min cijenu">
-        </div>
-
-        <div class="inputs">
-            <label>Maksimalna cijena:</label>
-            <input type="number" id="filter-max-cijena" placeholder="Unesite max cijenu">
-        </div>
-        <div class="inputs">
-            <label>Tip grijanja:</label>
-            <input type="text" id="filter-tip-grijanja" placeholder="Plin, Struja, itd.">
-        </div>
-        <div class="inputs">
-            <label>Lokacija:</label>
-            <input type="text" id="filter-lokacija" placeholder="Unesite lokaciju">
-        </div>
-        <div class="inputs">
-            <label>Godina izgradnje:</label>
-            <input type="number" id="filter-godina-izgradnje" placeholder="Unesite godinu">
-        </div>
-        <div class="inputs">
-            <label>Datum objave:</label>
-            <input type="date" id="filter-datum-objave">
-        </div>
-                
-        <button id="primijeni-filter">Primijeni filter</button>
+        <section id="results">
+            <h3>Rezultati:</h3>
+            <p>Prosječna kvadratura: <span id="prosjek-kvadratura">0</span></p>
+            <p>Outlier: <span id="outlier">N/A</span></p>
+            <p>Moje nekretnine: <span id="moje-nekretnine">N/A</span></p>
+        </section>
     </div>
-</section>
-    
+
+    <script src="../scripts/modules/SpisakNekretnina.js"></script>
+    <script src="../scripts/modules/StatistikaNekretnina.js"></script>
+    <script src="../scripts/pages/statistika.js"></script>
 </body>
 </html>

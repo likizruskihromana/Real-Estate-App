@@ -1,70 +1,58 @@
 <!DOCTYPE html>
 <html lang="bs-BA">
-
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Meni</title>
-        <link rel="stylesheet" type="text/css" href="../style/meni.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-    </head>
-
-    <body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meni</title>
+    <link rel="stylesheet" href="../style/meni.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <nav>
         <ul>
-            <a href="./nekretnine.html" target="_top">
-                <li id="nekretnineLink">
-                        <div class="text">Nekretnine</div>
-                    <i class="fa fa-home"></i>
-                </li>
-            </a>
-            <a href="./detalji.html" target="_top">
-                <li id="detaljiLink">
-                        <div class="text">Detalji</div>
-                    <i class="fa fa-info"></i>
-                </li>
-            </a>
-            <a href="./vijesti.html" target="_top">
-                <li id="vijestiLink">
-                    <div class="text">Vijesti</div>
+            <li><a href="nekretnine.html" target="_top" id="nekretnineLink">
+                <i class="fa fa-home"></i>
+                <span>Nekretnine</span>
+            </a></li>
+            
+            <li><a href="detalji.html" target="_top" id="detaljiLink">
+                <i class="fa fa-info"></i>
+                <span>Detalji</span>
+            </a></li>
+            
+            <li><a href="vijesti.html" target="_top" id="vijestiLink">
                 <i class="fa fa-newspaper-o"></i>
-                </li>
-            </a>
-            <a href="./statistika.html" target="_top">
-                <li id="statistikaLink">
-                    <div class="text">Statistika</div>    
-                    <i class="fa fa-newspaper-o"></i>
-                </li>
-            </a>
-            <a href="./mojiUpiti.html" target="_top">
-                <li id="mojiUpitiLink">
-                    <div class="text">Moji Upiti</div>    
-                    <i class="fa fa-newspaper-o"></i>
-                </li>
-            </a>
-            <a href="" target="_top">
-                <li id="odjavaLink">
-                    <div class="text">Odjava</div>
-                </li>
-            </a>
-            <a href="./prijava.html" target="_top">
-                <li id="prijavaLink">
-                    <div class="text">Prijava</div>
-                    <i class="fa fa-sign-in"></i>
-                </li>
-            </a>
-            <a href="./profil.html" target="_top">
-                <li id="profilLink" >
-                    <div class="text">Profil</div>
-                    <i class="fa fa-address-card"></i>
-                </li>
-            </a>
+                <span>Vijesti</span>
+            </a></li>
+            
+            <li><a href="statistika.html" target="_top" id="statistikaLink">
+                <i class="fa fa-bar-chart"></i>
+                <span>Statistika</span>
+            </a></li>
+            
+            <li><a href="mojiUpiti.html" target="_top" id="mojiUpitiLink">
+                <i class="fa fa-question-circle"></i>
+                <span>Moji Upiti</span>
+            </a></li>
+            
+            <li><a href="profil.html" target="_top" id="profilLink">
+                <i class="fa fa-user"></i>
+                <span>Profil</span>
+            </a></li>
+            
+            <li><a href="prijava.html" target="_top" id="prijavaLink">
+                <i class="fa fa-sign-in"></i>
+                <span>Prijava</span>
+            </a></li>
+            
+            <li><a href="#" id="odjavaLink">
+                <i class="fa fa-sign-out"></i>
+                <span>Odjava</span>
+            </a></li>
         </ul>
-    </body>
-    <script src="../scripts/PoziviAjax.js"></script>
-    <script src="../scripts/meni.js"></script>
+    </nav>
+
+    <script src="../scripts/api/PoziviAjax.js"></script>
+    <script src="../scripts/pages/meni.js"></script>
+</body>
 </html>
-
-
-
-

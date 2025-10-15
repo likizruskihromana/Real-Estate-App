@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: nekretnine_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: wt24
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - nekretnine_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  app:
+    build: .
+    container_name: nekretnine_app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: wt24
+      DB_USER: root
+      DB_PASSWORD: password
+      NODE_ENV: development
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app/backend
+      - ./public:/app/public
+      - /app/node_modules
+    networks:
+      - nekretnine_network
+    command: node backend/index.js
+
+volumes:
+  mysql_data:
+
+networks:
+  nekretnine_network:
+    driver: bridge

@@ -1,25 +1,21 @@
 <!DOCTYPE html>
 <html lang="bs-BA">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Moji Upiti</title>
-    <link rel="stylesheet" type="text/css" href="../style/mojiUpiti.css">
+    <link rel="stylesheet" href="../style/mojiUpiti.css">
 </head>
-
 <body>
-    <iframe src="meni.html">meni</iframe>
+    <iframe src="meni.html"></iframe>
 
-    <h1>Moji Upiti</h1>
+    <div class="container">
+        <h1>Moji Upiti</h1>
+        <button id="dugme" type="button">Prikaži Upite</button>
+        <div id="demo"></div>
+    </div>
 
-    <p id="demo"></p>
-
-    <button id="dugme" type="button">Prikaži</button>
-
-
-    <script src="../scripts/mojiUpiti.js"></script>
-    <script src="../scripts/poziviAjax.js"></script>
+    <script src="../scripts/api/PoziviAjax.js"></script>
+    <script src="../scripts/pages/mojiUpiti.js"></script>
 </body>
-
 </html>

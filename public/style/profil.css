@@ -6,49 +6,118 @@ body {
 }
 
 iframe {
-    border: none; 
+    border: none;
     width: 100%;
     height: 50px;
 }
 
 .user-profil {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 25px;
-    background-color: #6d675a;
-    border: 2px solid #8a8a8a;
-    text-align: left;
-    display: grid;
-    grid-template-columns: 1fr 0fr 1fr 1fr;
+    max-width: 800px;
+    margin: 40px auto;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    overflow: hidden;
 }
 
-@media screen and (max-width: 500px) {
-    .user-profil {
-        max-width: 400px;
-        margin: 0 auto;
-        padding: 25px;
-        background-color: #6d675a;
-        border: 2px solid #8a8a8a;
-        text-align: left;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-    }
+.profile-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px;
+    text-align: center;
 }
 
 .user-slika {
-    max-width: 150px;
-    margin-bottom: 15px;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid white;
+    object-fit: cover;
+    margin-bottom: 20px;
 }
 
-.user-profil p {
-    margin: 5px;
-    margin-bottom: 21px;
+.profile-header h2 {
+    margin: 10px 0;
+    font-size: 28px;
 }
 
-input[type="text"],
-input[type="password"] {
-    width: 85%;
-    padding: 5px;
-    margin: 5px;
-    margin-right: 25px;
+.username {
+    font-size: 18px;
+    opacity: 0.9;
+}
+
+.badge-admin {
+    display: inline-block;
+    background-color: #ffd700;
+    color: #333;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.profile-form {
+    padding: 40px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+    .user-profil {
+        margin: 20px;
+    }
+
+    .profile-header {
+        padding: 30px 20px;
+    }
+
+    .profile-form {
+        padding: 30px 20px;
+    }
 }
