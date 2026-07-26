@@ -1,8 +1,8 @@
 window.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const nekretninaId = urlParams.get('id') || 1;
-    
     loadNekretninaDetalji(nekretninaId);
+    setupUpitiCarousel(nekretninaId);
 });
 
 async function loadNekretninaDetalji(id) {
@@ -19,14 +19,12 @@ async function loadNekretninaDetalji(id) {
         displayOsnovniPodaci(nekretnina);
         displayDetalji(nekretnina);
         loadTop5(nekretnina.lokacija);
-        setupUpitiCarousel(nekretnina, id);
     });
 }
 
 function displayOsnovniPodaci(nekretnina) {
     document.getElementById('osnovno').innerHTML = `
-        <img src="../resources/stan1.jpg" alt="Nekretnina">
-        <p><strong>Naziv:</strong> ${nekretnina.naziv}</p>
+        <h1><strong> ${nekretnina.naziv}</strong></h1>
         <p><strong>Kvadratura:</strong> ${nekretnina.kvadratura} m²</p>
         <p><strong>Cijena:</strong> ${Helpers.formatPrice(nekretnina.cijena)}</p>
     `;
@@ -34,17 +32,11 @@ function displayOsnovniPodaci(nekretnina) {
 
 function displayDetalji(nekretnina) {
     document.getElementById('detalji').innerHTML = `
-        <div id="kolona1">
-            <p><strong>Tip grijanja:</strong> ${nekretnina.tip_grijanja}</p>
-            <p><strong>Lokacija:</strong> ${nekretnina.lokacija}</p>
-        </div>
-        <div id="kolona2">
-            <p><strong>Godina izgradnje:</strong> ${nekretnina.godina_izgradnje}</p>
-            <p><strong>Datum objave:</strong> ${Helpers.formatDate(nekretnina.datum_objave)}</p>
-        </div>
-        <div id="opis">
-            <p><strong>Opis:</strong> ${nekretnina.opis}</p>
-        </div>
+            <p><strong>Tip grijanja: </strong> ${nekretnina.tip_grijanja}</p>
+            <p><strong>Lokacija: </strong> ${nekretnina.lokacija}</p>
+            <p><strong>Godina izgradnje: </strong> ${nekretnina.godina_izgradnje}</p>
+            <p><strong>Datum objave: </strong> ${Helpers.formatDate(nekretnina.datum_objave)}</p>
+            <p><strong>Opis: </strong> ${nekretnina.opis}</p>
     `;
 }
 
@@ -65,19 +57,21 @@ function loadTop5(lokacija) {
     });
 }
 
-function setupUpitiCarousel(nekretnina, nekretninaId) {
+function setupUpitiCarousel(nekretninaId) {
     const sviElementi = document.querySelectorAll('#upiti .upit');
-    
     // Prikazi prva 3 upita
-    const upiti = nekretnina.Upiti || [];
-    for (let i = 0; i < 3; i++) {
-        if (upiti[i]) {
-            sviElementi[i].innerHTML = `<p>${upiti[i].tekst}</p>`;
-        } else {
-            sviElementi[i].innerHTML = '<p>Nema više upita</p>';
+    PoziviAjax.getMojiUpiti((err,upiti)=>{
+        if(err){
+            return;
         }
+        for (let i = 0; i < 3; i++) {
+            if (upiti[i]) {
+                sviElementi[i].innerHTML = `<p>${upiti[i].tekst}</p>`;
+            } else {
+                sviElementi[i].innerHTML = '<p>Nema više upita</p>';
+            }
     }
-
+    })
     // Setup carousel controls
     let currentPage = 1;
     
@@ -98,6 +92,7 @@ function loadUpitiPage(nekretninaId, page, sviElementi) {
             return;
         }
 
+        console.log(upiti)
         for (let i = 0; i < 3; i++) {
             if (upiti[i]) {
                 sviElementi[i].innerHTML = `<p>${upiti[i].tekst}</p>`;

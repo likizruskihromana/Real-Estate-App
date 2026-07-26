@@ -33,7 +33,7 @@ app.use('/api', routes);
 // HTML Routes
 const htmlRoutes = [
   'nekretnine.html', 'detalji.html', 'meni.html', 'prijava.html',
-  'profil.html', 'statistika.html', 'vijesti.html', 'mojiUpiti.html'
+  'profil.html', 'statistika.html', 'ponude.html', 'mojiUpiti.html', 'index.html'
 ];
 
 htmlRoutes.forEach(file => {
@@ -44,7 +44,7 @@ htmlRoutes.forEach(file => {
 
 // Root route
 app.get('/', (req, res) => {
-  res.redirect('/nekretnine.html');
+  res.redirect('/index.html');
 });
 
 // Inicijalizacija baze i seedovanje

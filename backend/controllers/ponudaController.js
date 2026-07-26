@@ -39,3 +39,13 @@ exports.createPonuda = async (req, res) => {
     res.status(500).json({ greska: 'Internal Server Error' });
   }
 };
+
+exports.getAll = async (req, res) => {
+  try {
+    const ponude = await Ponuda.findAll();
+    res.status(200).json(ponude);
+  } catch (error) {
+    console.error('Error fetching properties:', error);
+    res.status(500).json({ greska: 'Internal Server Error' });
+  }
+};

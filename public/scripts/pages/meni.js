@@ -6,27 +6,29 @@ window.onload = function () {
     const nekretnineLink = document.getElementById('nekretnineLink');
     const detaljiLink = document.getElementById('detaljiLink');
     const prijavaLink = document.getElementById('prijavaLink');
-    const vijestiLink = document.getElementById('vijestiLink');
+    const ponudeLink = document.getElementById('ponudeLink');
     const statistikaLink = document.getElementById('statistikaLink');
     const odjavaLink = document.getElementById('odjavaLink');
     const mojiUpitiLink = document.getElementById('mojiUpitiLink')
-
+    const pocetnaLink = document.getElementById('pocetnaLink')
     // Ako je korisnik prijavljen, pokažite opciju "Profil", inače pokažite opcije "Nekretnine", "Detalji" i "Prijava"
     if (loggedIn) {
       profilLink.style.display = 'block';
       nekretnineLink.style.display = 'block';
       detaljiLink.style.display = 'block';
       prijavaLink.style.display = 'none';
-      vijestiLink.style.display = 'block';
+      ponudeLink.style.display = 'block';
       statistikaLink.style.display = 'block';
       odjavaLink.style.display = 'block';
       mojiUpitiLink.style.display = 'block';
+      pocetnaLink.style.display = 'block';
     } else {
+      pocetnaLink.style.display = 'block';
       profilLink.style.display = 'none';
-      nekretnineLink.style.display = 'block';
-      detaljiLink.style.display = 'block';
+      nekretnineLink.style.display = 'none';
+      detaljiLink.style.display = 'none';
       prijavaLink.style.display = 'block';
-      vijestiLink.style.display = 'none';
+      ponudeLink.style.display = 'block';
       statistikaLink.style.display = 'none';
       odjavaLink.style.display = 'none';
       mojiUpitiLink.style.display = 'none';
@@ -41,19 +43,14 @@ window.onload = function () {
     // Ažurirajte meni na osnovu statusa prijave korisnika
     updateMenuForLoginStatus(loggedIn);
   });
-
-  // Dodajte event listener za opciju "Odjava"
   const odjavaLink = document.getElementById('odjavaLink');
   odjavaLink.addEventListener('click', function () {
     PoziviAjax.postLogout(function (err, data) {
       if (err != null) {
         window.alert(err);
       } else {
-        // Redirektujem se nazad na pocetnu stranicu prijava.html
-        window.location.href = "./prijava.html";
+        window.top.location.href = "./prijava.html";
       }
-
-      // Update menu for login status inside the callback
       updateMenuForLoginStatus(false);
     });
   });

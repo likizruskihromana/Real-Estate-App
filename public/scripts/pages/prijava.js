@@ -1,5 +1,4 @@
 window.addEventListener('DOMContentLoaded', () => {
-    const form = document.querySelector('form');
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
     const dugme = document.getElementById('dugme');
@@ -58,7 +57,7 @@ window.addEventListener('DOMContentLoaded', () => {
             if (data.poruka === 'Uspješna prijava') {
                 areaBelow.innerHTML = '<p class="success">Uspješna prijava! Preusmjeravanje...</p>';
                 setTimeout(() => {
-                    window.location.href = './nekretnine.html';
+                    window.location.href = './';
                 }, 500);
             } else {
                 showError('Neispravni podaci');

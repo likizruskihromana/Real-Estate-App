@@ -7,32 +7,37 @@
     <link rel="stylesheet" href="../style/detalji.css">
 </head>
 <body>
-    <iframe src="meni.html"></iframe>
+    <iframe src="/meni.html"></iframe>
 
-    <div id="osnovno"></div>
+    <div class="page">
+        <div id="osnovno"></div>
 
-    <h3>DETALJI</h3>
-    <div id="detalji"></div>
+        <h3>DETALJI</h3>
+        <div id="detalji"></div>
 
-    <h3>TOP 5 NEKRETNINA</h3>
-    <div id="top5-nekretnine">
-        <p>Na osnovu vaše lokacije, ovo su slične nekretnine:</p>
-        <div id="lista-nekretnina"></div>
+        <h3>TOP 5 NEKRETNINA</h3>
+        <div id="top5-nekretnine">
+            <p>Na osnovu vaše lokacije, ovo su slične nekretnine:</p>
+            <div id="lista-nekretnina"></div>
+        </div>
+
+        <h3>UPITI</h3>
+        <div id="upiti">
+            <div class="upit"></div>
+            <div class="upit"></div>
+            <div class="upit"></div>
+        </div>
+        <div id="carousel-controls">
+            <button class="carousel-btn" id="prev">Prethodni</button>
+            <button class="carousel-btn" id="next">Sljedeći</button>
+        </div>
+
     </div>
-
-    <h3>UPITI</h3>
-    <div id="upiti">
-        <div class="upit"></div>
-        <div class="upit"></div>
-        <div class="upit"></div>
-    </div>
-    <div id="carousel-controls">
-        <button class="carousel-btn" id="prev">Prethodni</button>
-        <button class="carousel-btn" id="next">Sljedeći</button>
-    </div>
-
-    <script src="../scripts/components/carousel.js"></script>
+    
+    <script src="../scripts/utils/helpers.js"></script>
     <script src="../scripts/api/PoziviAjax.js"></script>
     <script src="../scripts/pages/detalji.js"></script>
+    <script src="../scripts/components/carousel.js"></script>
+
 </body>
 </html>

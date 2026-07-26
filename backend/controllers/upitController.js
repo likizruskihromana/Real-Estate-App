@@ -50,7 +50,7 @@ exports.getMojiUpiti = async (req, res) => {
       include: [{ model: Nekretnina, attributes: ['id'] }],
     });
     if (upiti.length === 0) {
-      return res.status(404).json([]);
+      return res.status(404).json({statusText: ` Upiti: ${upiti}, korisnik: ${korisnik}`});
     }
     const izabraniUpiti = upiti.map((upit) => ({
       id_nekretnine: upit.Nekretnina.id,
