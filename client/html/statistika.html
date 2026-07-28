@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="bs-BA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistika</title>
+    <link rel="stylesheet" href="../style/statistika.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <iframe src="/meni.html"></iframe>
+
+    <div class="container">
+        <h1>Statistika Nekretnina</h1>
+        
+        <section id="filter-section">
+            <h2>Filtrirajte nekretnine</h2>
+            <div class="filter-grid">
+                <input type="text" id="filter-tip-nekretnine" placeholder="Tip nekretnine">
+                <input type="number" id="filter-min-kvadratura" placeholder="Min kvadratura">
+                <input type="number" id="filter-max-kvadratura" placeholder="Max kvadratura">
+                <input type="number" id="filter-min-cijena" placeholder="Min cijena">
+                <input type="number" id="filter-max-cijena" placeholder="Max cijena">
+                <input type="text" id="filter-lokacija" placeholder="Lokacija">
+                <button id="primijeni-filter">Primijeni Filter</button>
+            </div>
+        </section>
+
+        <section id="histogram-section">
+            <h2>Histogram Cijena</h2>
+            <div class="period-inputs">
+                <input type="number" id="period-od" placeholder="Od godine">
+                <input type="number" id="period-do" placeholder="Do godine">
+                <button id="dodaj-period">Dodaj Period</button>
+            </div>
+            <div class="cijena-inputs">
+                <input type="number" id="cijena-od" placeholder="Od cijene">
+                <input type="number" id="cijena-do" placeholder="Do cijene">
+                <button id="dodaj-raspon">Dodaj Raspon</button>
+            </div>
+            <button id="iscrtaj-histogram">Iscrtaj Histogram</button>
+            <div id="histogram-charts"></div>
+        </section>
+
+        <section id="results">
+            <h3>Rezultati:</h3>
+            <p>Prosječna kvadratura: <span id="prosjek-kvadratura">0</span></p>
+            <p>Outlier: <span id="outlier">N/A</span></p>
+            <p>Moje nekretnine: <span id="moje-nekretnine">N/A</span></p>
+        </section>
+    </div>
+
+    <script src="../scripts/utils/helpers.js"></script>
+    <script src="../scripts/api/PoziviAjax.js"></script>
+    <script src="../scripts/modules/StatistikaNekretnina.js"></script>
+    <script src="../scripts/pages/statistika.js"></script>
+</body>
+</html>

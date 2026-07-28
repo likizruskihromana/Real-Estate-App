@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="bs-BA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalji Nekretnine</title>
+    <link rel="stylesheet" href="../style/detalji.css">
+</head>
+<body>
+    <iframe src="/meni.html"></iframe>
+
+    <div class="page">
+        <!-- Grid layout za bolji raspored na većim ekranima -->
+        <div class="grid-layout">
+            
+            <!-- LIJEVA KOLONA -->
+            <div class="glavna-kolona">
+                <div class="card" id="osnovno-card">
+                    <div id="osnovno">
+                        <!-- JS puni ovo -->
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Detalji</h3>
+                    <div id="detalji" class="detalji-grid">
+                        <!-- JS puni ovo -->
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Interesovanja</h3>
+                    <div id="interesovanja">
+                        <div id="lista-interesovanja"></div>
+
+                        <form id="forma-interesovanje" class="modern-form">
+                            <h4>Dodaj novo interesovanje</h4>
+                            
+                            <div class="form-group">
+                                <label for="tip-interesovanja">Tip interesovanja:</label>
+                                <select id="tip-interesovanja" name="tip">
+                                    <option value="upit">Upit</option>
+                                    <option value="zahtjev">Zahtjev</option>
+                                    <option value="ponuda">Ponuda</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" id="polje-tekst">
+                                <label for="input-tekst">Tekst:</label>
+                                <textarea id="input-tekst" name="tekst" rows="3" required></textarea>
+                            </div>
+
+                            <div class="form-group polje-skriveno" id="polje-datum">
+                                <label for="input-trazeni-datum">Traženi datum pregleda:</label>
+                                <input type="date" id="input-trazeni-datum" name="trazeniDatum">
+                            </div>
+
+                            <div id="polje-cijena" class="polje-skriveno">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="input-cijena-ponude">Cijena ponude (KM):</label>
+                                        <input type="number" id="input-cijena-ponude" name="ponudaCijene" min="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="input-datum-ponude">Datum ponude:</label>
+                                        <input type="date" id="input-datum-ponude" name="datumPonude">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="input-vezana-ponuda">Odgovor na postojeću ponudu:</label>
+                                    <select id="input-vezana-ponuda" name="idVezanePonude">
+                                        <option value="">-- Nova (početna) ponuda --</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group checkbox-group">
+                                    <label id="label-odbijena-ponuda">
+                                        <input type="checkbox" id="input-odbijena-ponuda" name="odbijenaPonuda">
+                                        Odbij ponudu na koju se odgovara
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="submit" id="posalji-interesovanje" class="btn-primary">Pošalji</button>
+                            <p id="interesovanje-poruka" class="poruka"></p>
+                        </form>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Komentari</h3>
+                    <div id="komentari">
+                        <div id="lista-komentara"></div>
+
+                            <form id="forma-komentar" class="modern-form" style="margin-top: 15px;">
+                                <h4>Dodaj komentar</h4>
+                                <div class="form-group">
+                                    <textarea id="input-komentar-tekst" name="tekst" rows="3" placeholder="Napišite komentar..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn-primary">Pošalji komentar</button>
+                                <p id="komentar-poruka" class="poruka"></p>
+                            </form>
+                        </div>
+                    </div>  
+                </div>
+
+            <!-- DESNA KOLONA (Sidebar) -->
+            <div class="sporedna-kolona">
+                <div class="card">
+                    <h3>Upiti</h3>
+                    <div id="upiti-kontejner">
+                        <div id="upiti">
+                            <div class="upit"></div>
+                            <div class="upit"></div>
+                            <div class="upit"></div>
+                        </div>
+                        <div id="carousel-controls">
+                            <button class="carousel-btn btn-secondary" id="prev">Prethodni</button>
+                            <button class="carousel-btn btn-secondary" id="next">Sljedeći</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Slične nekretnine</h3>
+                    <p class="text-muted">Top 5 na osnovu iste lokacije</p>
+                    <div id="top5-nekretnine">
+                        <div id="lista-nekretnina"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <script src="../scripts/utils/helpers.js"></script>
+    <script src="../scripts/api/PoziviAjax.js"></script>
+    <script src="../scripts/pages/detalji.js"></script>
+    <script src="../scripts/components/carousel.js"></script>
+</body>
+</html>

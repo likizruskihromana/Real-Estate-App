@@ -1,0 +1,342 @@
+/* Definicija palete boja i varijabli za lakše održavanje */
+:root {
+    --primary-color: #ff9900;
+    --primary-hover: #e68a00;
+    --bg-color: #f4f7f6;
+    --text-main: #2d3748;
+    --text-muted: #718096;
+    --card-bg: #ffffff;
+    
+    /* Boje tipova nekretnina */
+    --color-stan: #3b82f6;
+    --color-kuca: #10b981;
+    --color-pp: #8b5cf6;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- BOČNI MENI (Iframe) --- */
+iframe {
+    border: none;
+    width: 250px;
+    position: fixed;
+    height: 100vh;
+    left: -230px; 
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 0 12px 12px 0;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.08);
+    z-index: 10;
+    background: #fff;
+}
+
+iframe:hover {
+    left: 0; 
+}
+
+/* --- GLAVNI ELEMENTI --- */
+.tip-nekretnine {
+    text-align: center;
+    font-weight: 700;
+    font-size: 28px;
+    margin: 30px 0;
+    color: var(--text-main);
+}
+
+.akcije-vrh {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    padding: 24px 40px 0;
+    box-sizing: border-box;
+}
+
+/* --- LISTA NEKRETNINA (Grid sistem) --- */
+.grid-lista-nekretnina {
+    display: grid;
+    /* Automatski prilagođava broj kolona širini ekrana */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    padding: 20px 40px 60px 40px;
+    margin-left: 20px; /* Prostor za skriveni bočni meni */
+}
+
+/* --- KARTICA NEKRETNINE --- */
+.nekretnina {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    border-top: 4px solid var(--color-stan); /* Podrazumijevana boja (Stan) */
+}
+
+.nekretnina:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+}
+
+/* Diskretne oznake tipa umjesto pune pozadine */
+.nekretnina.kuca {
+    border-top-color: var(--color-kuca);
+}
+
+.nekretnina.pp {
+    border-top-color: var(--color-pp);
+}
+
+.slika-nekretnine {
+    width: 100%;
+    height: 200px;
+    object-fit: cover; /* Sprečava distorziju slike */
+    border-bottom: 1px solid #edf2f7;
+}
+
+.detalji-nekretnine {
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.detalji-nekretnine h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.1rem;
+    color: var(--text-main);
+    line-height: 1.4;
+}
+
+.detalji-nekretnine p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.cijena-nekretnine {
+    padding: 0 20px;
+}
+
+.cijena-nekretnine p {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* --- DUGMAD NA KARTICI --- */
+.detalji-dugme {
+    display: block;
+    text-align: center;
+    margin: 16px 20px;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    padding: 10px 16px;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.detalji-dugme:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.nekretnina-akcije {
+    display: flex;
+    gap: 10px;
+    padding: 0 20px 20px;
+}
+
+.nekretnina-akcije button {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: opacity 0.2s, transform 0.1s;
+}
+
+.nekretnina-akcije button:active {
+    transform: scale(0.96);
+}
+
+.dugme-uredi {
+    background-color: #ebf4ff;
+    color: #4a5568;
+}
+
+.dugme-uredi:hover {
+    background-color: #4a4fb8;
+    color: white;
+}
+
+.dugme-obrisi {
+    background-color: #fff5f5;
+    color: #c53030;
+}
+
+.dugme-obrisi:hover {
+    background-color: #d64545;
+    color: white;
+}
+
+/* --- DUGME DODAJ --- */
+.dugme-dodaj {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(255, 153, 0, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.dugme-dodaj:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(255, 153, 0, 0.4);
+}
+
+/* --- MODAL FORMA --- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px); /* Moderni zamućeni efekat pozadine */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.skriven {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-box {
+    background: white;
+    border-radius: 12px;
+    padding: 32px;
+    width: 90%;
+    max-width: 550px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    transform: translateY(0) scale(1);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-overlay.skriven .modal-box {
+    transform: translateY(20px) scale(0.95);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #edf2f7;
+    padding-bottom: 16px;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 22px;
+    color: var(--text-main);
+}
+
+.modal-zatvori {
+    background: #f7fafc;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    color: #a0aec0;
+    transition: all 0.2s;
+}
+
+.modal-zatvori:hover {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+/* --- FORMA ELEMENTI --- */
+#nekretnina-forma .form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+#nekretnina-forma label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 14px;
+}
+
+#nekretnina-forma input,
+#nekretnina-forma select,
+#nekretnina-forma textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--text-main);
+    box-sizing: border-box;
+    background-color: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#nekretnina-forma input:focus,
+#nekretnina-forma select:focus,
+#nekretnina-forma textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.15);
+}
+
+.form-row {
+    display: flex;
+    gap: 16px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.forma-poruka {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    background-color: #fff5f5;
+    color: #c53030;
+    border: 1px solid #feb2b2;
+    display: flex;
+    align-items: center;
+}

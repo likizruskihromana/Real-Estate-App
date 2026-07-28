@@ -35,12 +35,12 @@ services:
       mysql:
         condition: service_healthy
     volumes:
-      - ./backend:/app/backend
-      - ./public:/app/public
+      - ./server:/app/server
+      - ./client:/app/client
       - /app/node_modules
     networks:
       - nekretnine_network
-    command: node backend/index.js
+    command: node server/index.js
 
 volumes:
   mysql_data:

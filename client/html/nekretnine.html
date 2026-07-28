@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="bs-BA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nekretnine</title>
+    <link rel="stylesheet" href="../style/nekretnine.css">
+</head>
+<body>
+    <iframe src="/meni.html"></iframe>
+
+    <div class="akcije-vrh">
+        <button id="dodaj-nekretninu-dugme" type="button" class="dugme-dodaj">+ Dodaj nekretninu</button>
+    </div>
+
+    <div class="tip-nekretnine" id="stan">
+        <h1>Stan</h1>
+        <div class="grid-lista-nekretnina" id="stan-lista"></div>
+    </div>
+
+    <div class="tip-nekretnine" id="kuca">
+        <h1>Kuća</h1>
+        <div class="grid-lista-nekretnina" id="kuca-lista"></div>
+    </div>
+
+    <div class="tip-nekretnine" id="pp">
+        <h1>Poslovni prostor</h1>
+        <div class="grid-lista-nekretnina" id="pp-lista"></div>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay skriven">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2 id="modal-naslov">Dodaj novu nekretninu</h2>
+                <button type="button" id="modal-zatvori" class="modal-zatvori">&times;</button>
+            </div>
+
+            <div id="modal-poruka" class="forma-poruka" style="display:none;"></div>
+
+            <form id="nekretnina-forma">
+                <input type="hidden" id="nekretnina-id">
+
+                <div class="form-group">
+                    <label for="f-tip">Tip nekretnine</label>
+                    <select id="f-tip" required>
+                        <option value="Stan">Stan</option>
+                        <option value="Kuća">Kuća</option>
+                        <option value="Poslovni prostor">Poslovni prostor</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="f-naziv">Naziv</label>
+                    <input type="text" id="f-naziv" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="f-kvadratura">Kvadratura (m²)</label>
+                        <input type="number" id="f-kvadratura" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="f-cijena">Cijena (KM)</label>
+                        <input type="number" id="f-cijena" min="1" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="f-lokacija">Lokacija</label>
+                        <input type="text" id="f-lokacija" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="f-grijanje">Tip grijanja</label>
+                        <input type="text" id="f-grijanje" placeholder="npr. centralno">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="f-godina">Godina izgradnje</label>
+                    <input type="number" id="f-godina" min="1800">
+                </div>
+
+                <div class="form-group">
+                    <label for="f-opis">Opis</label>
+                    <textarea id="f-opis" rows="3"></textarea>
+                </div>
+
+                <button type="submit" id="nekretnina-sacuvaj-dugme" class="dugme-dodaj">Sačuvaj</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../scripts/utils/helpers.js"></script>
+    <script src="../scripts/api/PoziviAjax.js"></script>
+    <script src="../scripts/pages/nekretnine.js"></script>
+</body>
+</html>

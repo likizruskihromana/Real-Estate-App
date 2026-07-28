@@ -2,11 +2,11 @@
   "name": "nekretnine-app",
   "version": "1.0.0",
   "description": "Full-stack aplikacija za nekretnine",
-  "main": "backend/index.js",
+  "main": "server/index.js",
   "scripts": {
-    "start": "node backend/index.js",
-    "dev": "nodemon backend/index.js",
-    "seed": "node backend/seeders/initialData.js",
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js",
+    "seed": "node server/seeders/initialData.js",
     "docker:up": "docker-compose up --build",
     "docker:down": "docker-compose down",
     "docker:clean": "docker-compose down -v"

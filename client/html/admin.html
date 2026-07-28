@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="bs-BA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="../style/admin.css">
+</head>
+<body>
+    <iframe src="/meni.html"></iframe>
+
+    <div class="admin-container">
+        <h1>Admin Panel</h1>
+
+        <div class="tabovi">
+            <button type="button" class="tab-dugme aktivan" data-tab="korisnici">Korisnici</button>
+            <button type="button" class="tab-dugme" data-tab="nekretnine">Nekretnine</button>
+            <button type="button" class="tab-dugme" data-tab="zahtjevi">Zahtjevi za pregled</button>
+        </div>
+
+        <div id="tab-korisnici" class="tab-sadrzaj aktivan">
+            <div id="korisnici-tabela"></div>
+        </div>
+
+        <div id="tab-nekretnine" class="tab-sadrzaj">
+            <div id="nekretnine-tabela"></div>
+        </div>
+
+        <div id="tab-zahtjevi" class="tab-sadrzaj">
+            <div id="zahtjevi-tabela"></div>
+        </div>
+    </div>
+
+    <script src="../scripts/utils/helpers.js"></script>
+    <script src="../scripts/api/PoziviAjax.js"></script>
+    <script src="../scripts/pages/admin.js"></script>
+</body>
+</html>

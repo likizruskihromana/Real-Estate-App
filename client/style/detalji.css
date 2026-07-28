@@ -1,0 +1,368 @@
+/* --- OSNOVNE VARIJABLE I RESET --- */
+:root {
+    --primary-color: #ff9900;
+    --primary-hover: #e68a00;
+    --bg-color: #f4f7f6;
+    --text-main: #2d3748;
+    --text-muted: #718096;
+    --card-bg: #ffffff;
+    --border-color: #edf2f7;
+    --success: #10b981;
+    --danger: #ef4444;
+    --info: #3b82f6;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4 {
+    margin-top: 0;
+    color: var(--text-main);
+}
+
+.text-muted {
+    color: var(--text-muted);
+    font-size: 0.9em;
+    margin-top: -10px;
+    margin-bottom: 15px;
+}
+
+/* --- BOČNI MENI (Iframe) --- */
+iframe {
+    border: none;
+    width: 250px;
+    position: fixed;
+    height: 100vh;
+    left: -230px; 
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 0 12px 12px 0;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.08);
+    z-index: 10;
+    background: #fff;
+}
+
+iframe:hover {
+    left: 0; 
+}
+
+/* --- GLAVNI LAYOUT --- */
+.page {
+    padding: 40px;
+    margin-left: 20px; /* Mjesto za skriveni meni */
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.grid-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+/* Prilagođavanje za mobitele */
+@media (max-width: 900px) {
+    .grid-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- KARTICE (Cards) --- */
+.card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    margin-bottom: 30px;
+    border: 1px solid var(--border-color);
+}
+
+.card h3 {
+    border-bottom: 2px solid var(--bg-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 1.25rem;
+}
+
+/* --- OSNOVNI PODACI --- */
+#osnovno h1 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: var(--text-main);
+}
+
+#osnovno p {
+    font-size: 1.1rem;
+    margin: 5px 0;
+}
+
+#osnovno p strong {
+    color: var(--text-muted);
+}
+
+#osnovno p:last-child strong {
+    color: var(--primary-color);
+}
+
+/* --- DETALJI GRID --- */
+.detalji-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+.detalji-grid p {
+    margin: 0;
+    background: #f8fafc;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+.detalji-grid p strong {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+/* --- TOP 5 NEKRETNINA --- */
+.nekretnina-item {
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    background: #fafaf9;
+    transition: transform 0.2s;
+}
+.nekretnina-item:hover {
+    transform: translateX(4px);
+    border-color: #cbd5e1;
+}
+.nekretnina-item p {
+    margin: 0;
+    font-size: 0.95rem;
+}
+.nekretnina-item p strong {
+    color: var(--text-main);
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* --- UPITI CAROUSEL --- */
+#upiti-kontejner {
+    display: flex;
+    flex-direction: column;
+}
+.upit {
+    padding: 16px;
+    background: #f0f9ff;
+    border-left: 4px solid var(--info);
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    min-height: 40px;
+}
+.upit p {
+    margin: 0;
+}
+#carousel-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+/* --- INTERESOVANJA LISTA --- */
+.interesovanje-item {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+}
+.interesovanje-item::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--text-muted);
+}
+.interesovanje-item p {
+    margin: 6px 0;
+    font-size: 0.95rem;
+}
+.interesovanje-item p strong {
+    color: var(--text-main);
+}
+.odgovor-vlasnika {
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 6px;
+    margin-top: 12px !important;
+    border-left: 3px solid var(--primary-color);
+}
+.napomena-ponuda {
+    font-size: 0.85rem !important;
+    color: var(--primary-color) !important;
+    font-style: italic;
+}
+
+/* Indikatori statusa (generisano kroz JS klase) */
+.interesovanje-item.odobren::before { background: var(--success); }
+.interesovanje-item.odbijena::before { background: var(--danger); }
+
+/* Forma unutar interesovanja (za odgovore) */
+.forma-odgovor {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.forma-odgovor textarea {
+    width: 100%;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    padding: 10px;
+    font-family: inherit;
+    resize: vertical;
+}
+.forma-odgovor button, .forma-odgovor-dugmad button {
+    align-self: flex-start;
+    background: var(--bg-color);
+    border: 1px solid #cbd5e0;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.forma-odgovor button:hover {
+    background: var(--text-main);
+    color: white;
+}
+.forma-odgovor-dugmad {
+    display: flex;
+    gap: 10px;
+}
+.forma-odgovor-dugmad button[data-odobri="true"]:hover { background: var(--success); border-color: var(--success); }
+.forma-odgovor-dugmad button[data-odobri="false"]:hover { background: var(--danger); border-color: var(--danger); }
+
+/* --- FORME (Dodavanje interesovanja) --- */
+.modern-form {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px dashed var(--border-color);
+}
+
+.modern-form h4 {
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-row {
+    display: flex;
+    gap: 16px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.modern-form label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.9rem;
+}
+
+.modern-form input[type="text"],
+.modern-form input[type="number"],
+.modern-form input[type="date"],
+.modern-form select,
+.modern-form textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.modern-form input:focus,
+.modern-form select:focus,
+.modern-form textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.15);
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+.polje-skriveno {
+    display: none !important;
+}
+
+/* --- DUGMAD OPŠTA --- */
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(255, 153, 0, 0.2);
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+    width: 100%;
+}
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(255, 153, 0, 0.3);
+}
+
+.btn-secondary {
+    background-color: white;
+    border: 1px solid #cbd5e0;
+    color: var(--text-main);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-secondary:hover:not(:disabled) {
+    background-color: #f1f5f9;
+}
+.btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.poruka {
+    margin-top: 15px;
+    font-weight: 600;
+    text-align: center;
+}

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="bs-BA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registracija</title>
+    <link rel="stylesheet" href="../style/prijava.css">
+</head>
+<body>
+    <iframe src="/meni.html"></iframe>
+
+    <div class="login-container">
+        <h2>Registracija</h2>
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="ime">Ime:</label>
+                <input type="text" id="ime" name="ime" required>
+            </div>
+
+            <div class="form-group">
+                <label for="prezime">Prezime:</label>
+                <input type="text" id="prezime" name="prezime" required>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Korisničko ime:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Lozinka:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password-confirm">Potvrdi lozinku:</label>
+                <input type="password" id="password-confirm" name="password-confirm" required>
+            </div>
+
+            <button type="submit" id="dugme">Registruj se</button>
+        </form>
+
+        <div id="areaBelow"></div>
+        <p class="link-registracija">Već imate nalog? <a href="prijava.html">Prijavite se</a></p>
+    </div>
+
+    <script src="../scripts/utils/helpers.js"></script>
+    <script src="../scripts/api/PoziviAjax.js"></script>
+    <script src="../scripts/pages/registracija.js"></script>
+</body>
+</html>

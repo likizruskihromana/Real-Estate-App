@@ -38,10 +38,17 @@ docker-compose down -v
 - **Frontend**: Vanilla JavaScript, HTML, CSS
 - **DevOps**: Docker, Docker Compose
 
+## 📁 Struktura Projekta
+
+```
+├── client/     # Frontend (HTML, CSS, JS)
+└── server/     # Backend (Express, Sequelize, MySQL)
+```
+
 ## 🔐 Default Credentials
 
-- **Admin**: username: `admin`, password: `admin123`
-- **User**: username: `marko`, password: `marko123`
+- **Admin**: username: `admin`, password: `admin`
+- **User**: username: `user`, password: `user`
 
 ## 📝 Environment Variables
 
