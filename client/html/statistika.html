@@ -11,10 +11,26 @@
     <iframe src="/meni.html"></iframe>
 
     <div class="container">
-        <h1>Statistika Nekretnina</h1>
-        
+        <h1>Statistika nekretnina</h1>
+
+        <!-- Sažetak kartice -->
+        <div class="stats-kartice" id="stats-kartice"></div>
+
+        <!-- Grafikon: po tipu -->
+        <section class="grafikon-sekcija">
+            <h2>Raspored po tipu nekretnine</h2>
+            <div class="grafikon-wrap"><canvas id="grafikon-tip"></canvas></div>
+        </section>
+
+        <!-- Grafikon: prosječna cijena po lokaciji -->
+        <section class="grafikon-sekcija">
+            <h2>Prosječna cijena po lokaciji</h2>
+            <div class="grafikon-wrap"><canvas id="grafikon-lokacija"></canvas></div>
+        </section>
+
+        <!-- Filter -->
         <section id="filter-section">
-            <h2>Filtrirajte nekretnine</h2>
+            <h2>Filtriraj i analiziraj</h2>
             <div class="filter-grid">
                 <input type="text" id="filter-tip-nekretnine" placeholder="Tip nekretnine">
                 <input type="number" id="filter-min-kvadratura" placeholder="Min kvadratura">
@@ -22,31 +38,36 @@
                 <input type="number" id="filter-min-cijena" placeholder="Min cijena">
                 <input type="number" id="filter-max-cijena" placeholder="Max cijena">
                 <input type="text" id="filter-lokacija" placeholder="Lokacija">
-                <button id="primijeni-filter">Primijeni Filter</button>
+                <button id="primijeni-filter">Primijeni filter</button>
+            </div>
+            <div class="filter-rezultati">
+                <p>Prosječna kvadratura: <strong><span id="prosjek-kvadratura">—</span> m²</strong></p>
+                <p>Outlier (cijena): <strong><span id="outlier">—</span></strong></p>
+                <p id="moje-nekretnine-wrap">Nekretnine gdje sam upit poslao/la: <strong><span id="moje-nekretnine">—</span></strong></p>
             </div>
         </section>
 
+        <!-- Histogram -->
         <section id="histogram-section">
-            <h2>Histogram Cijena</h2>
-            <div class="period-inputs">
-                <input type="number" id="period-od" placeholder="Od godine">
-                <input type="number" id="period-do" placeholder="Do godine">
-                <button id="dodaj-period">Dodaj Period</button>
+            <h2>Histogram cijena po godištu</h2>
+            <div class="histogram-inputs">
+                <div class="input-group">
+                    <label>Dodaj period (godina):</label>
+                    <input type="number" id="period-od" placeholder="Od">
+                    <input type="number" id="period-do" placeholder="Do">
+                    <button id="dodaj-period">Dodaj</button>
+                </div>
+                <div class="input-group">
+                    <label>Dodaj raspon cijena (KM):</label>
+                    <input type="number" id="cijena-od" placeholder="Od">
+                    <input type="number" id="cijena-do" placeholder="Do">
+                    <button id="dodaj-raspon">Dodaj</button>
+                </div>
             </div>
-            <div class="cijena-inputs">
-                <input type="number" id="cijena-od" placeholder="Od cijene">
-                <input type="number" id="cijena-do" placeholder="Do cijene">
-                <button id="dodaj-raspon">Dodaj Raspon</button>
-            </div>
-            <button id="iscrtaj-histogram">Iscrtaj Histogram</button>
+            <div id="periodi-lista" class="oznake-lista"></div>
+            <div id="rasponi-lista" class="oznake-lista"></div>
+            <button id="iscrtaj-histogram" class="btn-primary-stat">Iscrtaj histogram</button>
             <div id="histogram-charts"></div>
-        </section>
-
-        <section id="results">
-            <h3>Rezultati:</h3>
-            <p>Prosječna kvadratura: <span id="prosjek-kvadratura">0</span></p>
-            <p>Outlier: <span id="outlier">N/A</span></p>
-            <p>Moje nekretnine: <span id="moje-nekretnine">N/A</span></p>
         </section>
     </div>
 

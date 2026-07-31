@@ -1,4 +1,49 @@
-const { Korisnik, Nekretnina, Zahtjev } = require('../models');
+const { Korisnik, Nekretnina, Zahtjev, Ponuda, Komentar } = require('../models');
+const komentarController = require('./komentarController');
+
+exports.getDashboard = async (req, res) => {
+  try {
+    const [brojKorisnika, brojAdmina, brojAktivnih, brojProdanih, brojZahtjevaNaCekanju, brojKomentara] = await Promise.all([
+      Korisnik.count(),
+      Korisnik.count({ where: { admin: true } }),
+      Nekretnina.count({ where: { kupljeno: false } }),
+      Nekretnina.count({ where: { kupljeno: true } }),
+      Zahtjev.count({ where: { odobren: false } }),
+      Komentar.count(),
+    ]);
+
+    res.status(200).json({
+      brojKorisnika,
+      brojAdmina,
+      brojAktivnih,
+      brojProdanih,
+      brojZahtjevaNaCekanju,
+      brojKomentara,
+    });
+  } catch (error) {
+    console.error('Error fetching admin dashboard:', error);
+    res.status(500).json({ greska: 'Internal Server Error' });
+  }
+};
+
+exports.getKomentari = komentarController.getSviKomentari;
+exports.deleteKomentar = komentarController.deleteKomentar;
+
+exports.getPonude = async (req, res) => {
+  try {
+    const ponude = await Ponuda.findAll({
+      include: [
+        { model: Korisnik, attributes: ['id', 'username'] },
+        { model: Nekretnina, attributes: ['id', 'naziv', 'kupljeno'] },
+      ],
+      order: [['id', 'DESC']],
+    });
+    res.status(200).json(ponude);
+  } catch (error) {
+    console.error('Error fetching offers for admin:', error);
+    res.status(500).json({ greska: 'Internal Server Error' });
+  }
+};
 
 exports.getKorisnici = async (req, res) => {
   try {

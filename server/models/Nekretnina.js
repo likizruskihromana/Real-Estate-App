@@ -12,6 +12,10 @@ module.exports = (sequelize) => {
     godina_izgradnje: { type: DataTypes.INTEGER, allowNull: true },
     datum_objave: { type: DataTypes.DATEONLY, allowNull: false },
     opis: { type: DataTypes.TEXT, allowNull: true },
+    kupljeno: { type: DataTypes.BOOLEAN, defaultValue: false },
+    datumKupovine: { type: DataTypes.DATE, allowNull: true },
+    prodajnaCijena: { type: DataTypes.DECIMAL, allowNull: true },
+    kupacId: { type: DataTypes.INTEGER, allowNull: true },
   }, {
     freezeTableName: true,
     tableName: 'nekretnina',

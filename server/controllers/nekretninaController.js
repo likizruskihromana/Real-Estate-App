@@ -1,4 +1,4 @@
-const { Nekretnina, Upit, Zahtjev, Ponuda } = require('../models');
+const { Nekretnina, Upit, Zahtjev, Ponuda, Korisnik } = require('../models');
 
 const DOZVOLJENI_TIPOVI = ['Stan', 'Kuća', 'Poslovni prostor'];
 
@@ -36,10 +36,27 @@ function validirajPodatke(body, { zahtijevajSvaPolja }) {
 
 exports.getAll = async (req, res) => {
   try {
-    const nekretnine = await Nekretnina.findAll();
+    const nekretnine = await Nekretnina.findAll({ where: { kupljeno: false } });
     res.status(200).json(nekretnine);
   } catch (error) {
     console.error('Error fetching properties:', error);
+    res.status(500).json({ greska: 'Internal Server Error' });
+  }
+};
+
+exports.getArhiva = async (req, res) => {
+  try {
+    const nekretnine = await Nekretnina.findAll({
+      where: { kupljeno: true },
+      include: [
+        { model: Korisnik, attributes: ['id', 'username'] },
+        { model: Korisnik, as: 'Kupac', attributes: ['id', 'username'] },
+      ],
+      order: [['datumKupovine', 'DESC']],
+    });
+    res.status(200).json(nekretnine);
+  } catch (error) {
+    console.error('Error fetching archive:', error);
     res.status(500).json({ greska: 'Internal Server Error' });
   }
 };
@@ -225,31 +242,33 @@ exports.getInteresovanja = async (req, res) => {
       }
     }
 
-    // Provjeri da li je bilo koja ponuda u lancu (uzlazno, do korijena) odbijena.
+    // Provjeri da li je bilo koja ponuda u lancu (uzlazno, do korijena) odbijena ili prihvaćena.
     // Ako jeste, na taj lanac se više ne mogu dodavati nove ponude.
     const ponudaById = new Map(svePonude.map((p) => [p.id, p]));
-    const lanacOdbijenCache = new Map();
-    const jeLanacOdbijen = (ponuda) => {
+    const lanacZavrsenCache = new Map();
+    const jeLanacZavrsen = (ponuda) => {
       if (!ponuda) return false;
-      if (lanacOdbijenCache.has(ponuda.id)) return lanacOdbijenCache.get(ponuda.id);
-      lanacOdbijenCache.set(ponuda.id, true); // privremeno, za sprječavanje ciklusa
+      if (lanacZavrsenCache.has(ponuda.id)) return lanacZavrsenCache.get(ponuda.id);
+      lanacZavrsenCache.set(ponuda.id, true); // privremeno, za sprječavanje ciklusa
       const roditelj = ponuda.idVezanePonude ? ponudaById.get(ponuda.idVezanePonude) : null;
-      const rezultat = !!ponuda.odbijenaPonuda || jeLanacOdbijen(roditelj);
-      lanacOdbijenCache.set(ponuda.id, rezultat);
+      const rezultat = !!ponuda.odbijenaPonuda || !!ponuda.prihvacenaPonuda || jeLanacZavrsen(roditelj);
+      lanacZavrsenCache.set(ponuda.id, rezultat);
       return rezultat;
     };
 
     const ponude = svePonude.map((p) => {
       const smijeVidjetiCijenu = isAdmin || jeVlasnikNekretnine || dozvoljeniIdPonude.has(p.id);
-      const lanacZavrsen = jeLanacOdbijen(p);
+      const lanacZavrsen = jeLanacZavrsen(p);
       const bazniPodaci = {
         id: p.id,
         tekst: p.tekst,
         datumPonude: p.datumPonude,
         odbijenaPonuda: p.odbijenaPonuda,
+        prihvacenaPonuda: p.prihvacenaPonuda,
         idVezanePonude: p.idVezanePonude,
         KorisnikId: p.KorisnikId,
         mozeOdgovoriti: !lanacZavrsen && (isAdmin || jeVlasnikNekretnine || dozvoljeniIdPonude.has(p.id)),
+        mozePrihvatiti: !lanacZavrsen && !p.odbijenaPonuda && (isAdmin || jeVlasnikNekretnine) && !nekretnina.kupljeno,
       };
       if (smijeVidjetiCijenu) {
         bazniPodaci.cijenaPonude = p.cijenaPonude;
@@ -259,6 +278,7 @@ exports.getInteresovanja = async (req, res) => {
 
     res.json({
       jeVlasnik: jeVlasnikNekretnine,
+      kupljeno: nekretnina.kupljeno,
       upiti: nekretnina.Upiti,
       zahtjevi: nekretnina.Zahtjevi,
       ponude,

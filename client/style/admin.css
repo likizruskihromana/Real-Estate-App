@@ -173,3 +173,42 @@ iframe:hover {
         white-space: nowrap;
     }
 }
+
+/* Dashboard kartice */
+.dashboard-kartice {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.dash-kartica {
+    background: white;
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-top: 3px solid #4a4fb8;
+}
+
+.dash-kartica.zelena { border-top-color: #2f9e44; }
+.dash-kartica.crvena { border-top-color: #d64545; }
+.dash-kartica.narandzasta { border-top-color: #ff9900; }
+
+.dash-broj { font-size: 26px; font-weight: bold; color: #222; }
+.dash-labela { font-size: 12px; color: #888; }
+
+/* Oznake */
+.oznaka-prodano-mala {
+    background-color: #fdecea;
+    color: #d64545;
+}
+
+.tekst-skracen {
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

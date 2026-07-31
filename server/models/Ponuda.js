@@ -7,6 +7,7 @@ module.exports = (sequelize) => {
     cijenaPonude: { type: DataTypes.DECIMAL, allowNull: false },
     datumPonude: { type: DataTypes.DATE, allowNull: false },
     odbijenaPonuda: { type: DataTypes.BOOLEAN, defaultValue: false },
+    prihvacenaPonuda: { type: DataTypes.BOOLEAN, defaultValue: false },
   }, {
     freezeTableName: true,
     tableName: 'ponuda',

@@ -1,9 +1,11 @@
+let trenutnaNekretninaId = null;
+let nekretninaKupljena = false;
+
 window.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const nekretninaId = urlParams.get('id') || 1;
-    
+
     loadNekretninaDetalji(nekretninaId);
-    loadKomentari(nekretninaId);
 });
 
 function toggleFormaOdgovora(komentarId) {
@@ -24,6 +26,7 @@ async function loadNekretninaDetalji(id) {
             return;
         }
 
+        nekretninaKupljena = !!nekretnina.kupljeno;
         displayOsnovniPodaci(nekretnina);
         displayDetalji(nekretnina);
         loadTop5(nekretnina.lokacija);
@@ -36,9 +39,10 @@ async function loadNekretninaDetalji(id) {
 
 function displayOsnovniPodaci(nekretnina) {
     document.getElementById('osnovno').innerHTML = `
-        <h1><strong> ${nekretnina.naziv}</strong></h1>
+        <h1><strong> ${nekretnina.naziv}</strong> ${nekretnina.kupljeno ? '<span class="oznaka-prodano">PRODANO</span>' : ''}</h1>
         <p><strong>Kvadratura:</strong> ${nekretnina.kvadratura} m²</p>
         <p><strong>Cijena:</strong> ${Helpers.formatPrice(nekretnina.cijena)}</p>
+        ${nekretnina.kupljeno ? `<p class="napomena-prodano">Prodano ${Helpers.formatDate(nekretnina.datumKupovine)} za ${Helpers.formatPrice(nekretnina.prodajnaCijena)}.</p>` : ''}
     `;
 }
 
@@ -84,7 +88,7 @@ function initUpitiCarousel(nekretninaId, prvaTriUpita) {
         for (let i = 0; i < 3; i++) {
             if (upiti && upiti[i]) {
                 const u = upiti[i];
-                const autorIme = u.Korisnik ? (u.Korisnik.ime ? `${u.Korisnik.ime} ${u.Korisnik.prezime}` : u.Korisnik.korisnickoIme) : 'Korisnik';
+                const autorIme = u.Korisnik ? (u.Korisnik.ime ? `${u.Korisnik.ime} ${u.Korisnik.prezime}` : u.Korisnik.username) : 'Korisnik';
                 sviElementi[i].innerHTML = `<p><strong>${autorIme}:</strong> ${u.tekst}</p>`;
             } else {
                 sviElementi[i].innerHTML = '<p>Nema više upita</p>';
@@ -132,8 +136,6 @@ function initUpitiCarousel(nekretninaId, prvaTriUpita) {
 
 // ==== INTERESOVANJA ====
 
-let trenutnaNekretninaId = null;
-
 function loadInteresovanja(nekretninaId) {
     trenutnaNekretninaId = nekretninaId;
     PoziviAjax.getKorisnik((korisnikErr, korisnik) => {
@@ -157,7 +159,7 @@ function prikaziListuInteresovanja(interesovanja, trenutniKorisnik) {
     const jeVlasnikNekretnine = !!(trenutniKorisnik && (trenutniKorisnik.admin || interesovanja.jeVlasnik));
 
     const upiti = (interesovanja.upiti || []).map(u => {
-        const autorIme = u.Korisnik ? (u.Korisnik.ime ? `${u.Korisnik.ime} ${u.Korisnik.prezime}` : u.Korisnik.korisnickoIme) : 'Korisnik';
+        const autorIme = u.Korisnik ? (u.Korisnik.ime ? `${u.Korisnik.ime} ${u.Korisnik.prezime}` : u.Korisnik.username) : 'Korisnik';
         return `
             <div class="interesovanje-item">
                 <p><strong>#${u.id} — Upit</strong> (Autor: ${autorIme})</p>
@@ -174,7 +176,7 @@ function prikaziListuInteresovanja(interesovanja, trenutniKorisnik) {
         `;
     });
 const zahtjevi = (interesovanja.zahtjevi || []).map(z => {
-        const autorIme = z.Korisnik ? (z.Korisnik.ime ? `${z.Korisnik.ime} ${z.Korisnik.prezime}` : z.Korisnik.korisnickoIme) : 'Korisnik';
+        const autorIme = z.Korisnik ? (z.Korisnik.ime ? `${z.Korisnik.ime} ${z.Korisnik.prezime}` : z.Korisnik.username) : 'Korisnik';
         return `
             <div class="interesovanje-item ${z.odobren ? 'odobren' : ''}">
                 <p><strong>#${z.id} — Zahtjev za pregled</strong> (Autor: ${autorIme})</p>
@@ -195,26 +197,43 @@ const zahtjevi = (interesovanja.zahtjevi || []).map(z => {
         `;
     });
 
-    let ponude = [];
-    if (jeVlasnikNekretnine) {
-        ponude = (interesovanja.ponude || []).map(p => {
-            const ponudjacIme = p.Korisnik ? (p.Korisnik.ime ? `${p.Korisnik.ime} ${p.Korisnik.prezime}` : p.Korisnik.korisnickoIme) : 'Korisnik';
-            return `
-                <div class="interesovanje-item ${p.odbijenaPonuda ? 'odbijena' : ''}">
-                    <p><strong>#${p.id} — Ponuda${p.idVezanePonude ? ` (odgovor na #${p.idVezanePonude})` : ''}</strong> (Ponuđač: ${ponudjacIme})</p>
-                    <p>${p.tekst}</p>
-                    ${p.cijenaPonude !== undefined ? `<p>Cijena: ${Helpers.formatPrice(p.cijenaPonude)}</p>` : ''}
-                    <p>Status: ${p.odbijenaPonuda ? 'Odbijena' : 'Aktivna'}</p>
-                    ${p.mozeOdgovoriti ? '<p class="napomena-ponuda">Možete odgovoriti na ovu ponudu putem forme ispod.</p>' : ''}
-                </div>
-            `;
-        });
-    }
+    const ponude = (interesovanja.ponude || []).map(p => {
+        const ponudjacIme = p.Korisnik ? (p.Korisnik.ime ? `${p.Korisnik.ime} ${p.Korisnik.prezime}` : p.Korisnik.username) : `korisnik #${p.KorisnikId}`;
+        let statusText = 'Aktivna';
+        if (p.prihvacenaPonuda) statusText = 'Prihvaćena';
+        else if (p.odbijenaPonuda) statusText = 'Odbijena';
+
+        return `
+            <div class="interesovanje-item ${p.odbijenaPonuda ? 'odbijena' : ''} ${p.prihvacenaPonuda ? 'odobren' : ''}">
+                <p><strong>#${p.id} — Ponuda${p.idVezanePonude ? ` (odgovor na #${p.idVezanePonude})` : ''}</strong> (Ponuđač: ${ponudjacIme})</p>
+                <p>${p.tekst}</p>
+                ${p.cijenaPonude !== undefined ? `<p>Cijena: ${Helpers.formatPrice(p.cijenaPonude)}</p>` : ''}
+                <p>Status: ${statusText}</p>
+                ${p.mozeOdgovoriti ? '<p class="napomena-ponuda">Možete odgovoriti na ovu ponudu putem forme ispod ("Odgovor na postojeću ponudu").</p>' : ''}
+                ${p.mozePrihvatiti ? `<button type="button" class="btn-prihvati-ponudu" data-id="${p.id}">Prihvati ponudu</button>` : ''}
+            </div>
+        `;
+    });
 
     const sveStavke = [...upiti, ...zahtjevi, ...ponude];
     container.innerHTML = sveStavke.length
         ? sveStavke.join('')
         : '<p>Za ovu nekretninu još nema interesovanja.</p>';
+
+    container.querySelectorAll('.btn-prihvati-ponudu').forEach(dugme => {
+        dugme.addEventListener('click', () => {
+            if (!confirm('Prihvatanjem ove ponude nekretnina se označava kao PRODANA i sve ostale ponude se automatski odbijaju. Nastaviti?')) return;
+            dugme.disabled = true;
+            PoziviAjax.prihvatiPonudu(dugme.dataset.id, (err) => {
+                if (err) {
+                    alert(err.statusText || 'Greška prilikom prihvatanja ponude.');
+                    dugme.disabled = false;
+                    return;
+                }
+                loadNekretninaDetalji(trenutnaNekretninaId);
+            });
+        });
+    });
 
     container.querySelectorAll('.forma-odgovor').forEach(forma => {
         forma.addEventListener('submit', (e) => {
@@ -258,6 +277,14 @@ const zahtjevi = (interesovanja.zahtjevi || []).map(z => {
 
 function setupFormaInteresovanje(nekretninaId, trenutniKorisnik, sveponude) {
     const forma = document.getElementById('forma-interesovanje');
+
+    if (nekretninaKupljena) {
+        if (forma) {
+            forma.outerHTML = '<p class="napomena-prodano">Nekretnina je prodana — više nije moguće slati upite, zahtjeve ni ponude.</p>';
+        }
+        return;
+    }
+
     const tipSelect = document.getElementById('tip-interesovanja');
     const poljeDatum = document.getElementById('polje-datum');
     const poljeCijena = document.getElementById('polje-cijena');
@@ -416,8 +443,10 @@ function prikaziListuKomentara(nekretninaId, komentari, trenutniKorisnik) {
 
     // 2. Rekurzivna funkcija za iscrtavanje komentara i svih nivoa odgovora
     function generisiHTMLKomentara(k) {
-        const autor = k.Korisnik ? (k.Korisnik.ime ? `${k.Korisnik.ime} ${k.Korisnik.prezime}` : k.Korisnik.korisnickoIme) : 'Korisnik';
+        const autor = k.Korisnik ? (k.Korisnik.ime ? `${k.Korisnik.ime} ${k.Korisnik.prezime}` : k.Korisnik.username) : 'Korisnik';
         const tacnoVrijeme = formatVrijeme(k.createdAt);
+        const mozeBrisati = trenutniKorisnik && trenutniKorisnik.admin;
+        const mozeOdgovoriti = trenutniKorisnik && !nekretninaKupljena;
 
         let odgovoriHtml = '';
         if (k.Odgovori && k.Odgovori.length > 0) {
@@ -434,20 +463,34 @@ function prikaziListuKomentara(nekretninaId, komentari, trenutniKorisnik) {
                 
                 ${odgovoriHtml}
 
-                ${trenutniKorisnik ? `
-                    <div style="margin-top: 6px;">
-                        <button type="button" class="btn-otvori-odgovor" onclick="toggleFormaOdgovora(${k.id})" style="font-size: 11px; padding: 2px 6px;">Odgovori</button>
-                        <form id="forma-odgovor-komentar-${k.id}" class="forma-odgovor-komentar" data-komentar-id="${k.id}" style="display: none; margin-top: 6px;">
-                            <textarea rows="2" placeholder="Napišite odgovor..." required style="width: 100%;"></textarea>
-                            <button type="submit" style="font-size: 11px; margin-top: 4px;">Pošalji odgovor</button>
-                        </form>
-                    </div>
+                <div style="margin-top: 6px; display: flex; gap: 8px; align-items: center;">
+                    ${mozeOdgovoriti ? `<button type="button" class="btn-otvori-odgovor" onclick="toggleFormaOdgovora(${k.id})" style="font-size: 11px; padding: 2px 6px;">Odgovori</button>` : ''}
+                    ${mozeBrisati ? `<button type="button" class="btn-obrisi-komentar" data-komentar-id="${k.id}" style="font-size: 11px; padding: 2px 6px; background-color: #d64545; color: white; border: none; border-radius: 4px; cursor: pointer;">Obriši</button>` : ''}
+                </div>
+                ${mozeOdgovoriti ? `
+                    <form id="forma-odgovor-komentar-${k.id}" class="forma-odgovor-komentar" data-komentar-id="${k.id}" style="display: none; margin-top: 6px;">
+                        <textarea rows="2" placeholder="Napišite odgovor..." required style="width: 100%;"></textarea>
+                        <button type="submit" style="font-size: 11px; margin-top: 4px;">Pošalji odgovor</button>
+                    </form>
                 ` : ''}
             </div>
         `;
     }
 
     container.innerHTML = korijenskiKomentari.map(k => generisiHTMLKomentara(k)).join('');
+
+    container.querySelectorAll('.btn-obrisi-komentar').forEach(dugme => {
+        dugme.addEventListener('click', () => {
+            if (!confirm('Obrisati ovaj komentar (i sve njegove odgovore)?')) return;
+            PoziviAjax.obrisiKomentar(dugme.dataset.komentarId, (err) => {
+                if (err) {
+                    alert((err && err.statusText) || 'Greška pri brisanju komentara.');
+                    return;
+                }
+                loadKomentari(nekretninaId);
+            });
+        });
+    });
 
     // 3. Direktno vezivanje event listenera na forme (bez suvišnog cloneNode)
     container.querySelectorAll('.forma-odgovor-komentar').forEach(forma => {
@@ -473,6 +516,11 @@ function prikaziListuKomentara(nekretninaId, komentari, trenutniKorisnik) {
 function setupFormaKomentar(nekretninaId) {
     const forma = document.getElementById('forma-komentar');
     if (!forma) return;
+
+    if (nekretninaKupljena) {
+        forma.outerHTML = '<p class="napomena-prodano">Nekretnina je prodana — komentarisanje je zatvoreno.</p>';
+        return;
+    }
 
     const novaForma = forma.cloneNode(true);
     forma.parentNode.replaceChild(novaForma, forma);

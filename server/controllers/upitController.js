@@ -16,6 +16,9 @@ exports.createUpit = async (req, res) => {
     if (!nekretnina) {
       return res.status(400).json({ greska: `Nekretnina sa id-em ${nekretnina_id} ne postoji` });
     }
+    if (nekretnina.kupljeno) {
+      return res.status(400).json({ greska: 'Nekretnina je već prodana, upiti više nisu mogući.' });
+    }
     const brojUpitaOdLoggedUser = nekretnina.Upiti.filter(
       (upit) => upit.KorisnikId === korisnik.id
     ).length;

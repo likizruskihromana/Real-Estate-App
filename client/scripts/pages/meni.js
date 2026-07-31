@@ -7,18 +7,20 @@ window.onload = function () {
     const prijavaLink = document.getElementById('prijavaLink');
     const registracijaLink = document.getElementById('registracijaLink');
     const adminLink = document.getElementById('adminLink');
+    const arhivaLink = document.getElementById('arhivaLink');
     const ponudeLink = document.getElementById('ponudeLink');
     const statistikaLink = document.getElementById('statistikaLink');
     const odjavaLink = document.getElementById('odjavaLink');
-    const mojiUpitiLink = document.getElementById('mojiUpitiLink')
-    const pocetnaLink = document.getElementById('pocetnaLink')
-    // Ako je korisnik prijavljen, pokažite opciju "Profil", inače pokažite opcije "Nekretnine", "Prijava" i "Registracija"
+    const mojiUpitiLink = document.getElementById('mojiUpitiLink');
+    const pocetnaLink = document.getElementById('pocetnaLink');
+
     if (loggedIn) {
       profilLink.style.display = 'block';
       nekretnineLink.style.display = 'block';
       prijavaLink.style.display = 'none';
       registracijaLink.style.display = 'none';
       adminLink.style.display = isAdmin ? 'block' : 'none';
+      arhivaLink.style.display = 'block';
       ponudeLink.style.display = 'block';
       statistikaLink.style.display = 'block';
       odjavaLink.style.display = 'block';
@@ -31,6 +33,7 @@ window.onload = function () {
       prijavaLink.style.display = 'block';
       registracijaLink.style.display = 'block';
       adminLink.style.display = 'none';
+      arhivaLink.style.display = 'block';
       ponudeLink.style.display = 'block';
       statistikaLink.style.display = 'none';
       odjavaLink.style.display = 'none';

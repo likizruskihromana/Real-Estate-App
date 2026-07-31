@@ -12,23 +12,21 @@
     <div class="admin-container">
         <h1>Admin Panel</h1>
 
+        <div id="dashboard-kartice" class="dashboard-kartice"></div>
+
         <div class="tabovi">
             <button type="button" class="tab-dugme aktivan" data-tab="korisnici">Korisnici</button>
             <button type="button" class="tab-dugme" data-tab="nekretnine">Nekretnine</button>
-            <button type="button" class="tab-dugme" data-tab="zahtjevi">Zahtjevi za pregled</button>
+            <button type="button" class="tab-dugme" data-tab="zahtjevi">Zahtjevi</button>
+            <button type="button" class="tab-dugme" data-tab="ponude">Ponude</button>
+            <button type="button" class="tab-dugme" data-tab="komentari">Komentari</button>
         </div>
 
-        <div id="tab-korisnici" class="tab-sadrzaj aktivan">
-            <div id="korisnici-tabela"></div>
-        </div>
-
-        <div id="tab-nekretnine" class="tab-sadrzaj">
-            <div id="nekretnine-tabela"></div>
-        </div>
-
-        <div id="tab-zahtjevi" class="tab-sadrzaj">
-            <div id="zahtjevi-tabela"></div>
-        </div>
+        <div id="tab-korisnici" class="tab-sadrzaj aktivan"><div id="korisnici-tabela"></div></div>
+        <div id="tab-nekretnine" class="tab-sadrzaj"><div id="nekretnine-tabela"></div></div>
+        <div id="tab-zahtjevi" class="tab-sadrzaj"><div id="zahtjevi-tabela"></div></div>
+        <div id="tab-ponude" class="tab-sadrzaj"><div id="ponude-tabela"></div></div>
+        <div id="tab-komentari" class="tab-sadrzaj"><div id="komentari-tabela"></div></div>
     </div>
 
     <script src="../scripts/utils/helpers.js"></script>

@@ -1,26 +1,18 @@
-const { Komentar, Korisnik } = require('../models');
+const { Komentar, Korisnik, Nekretnina } = require('../models');
 
+const KORISNIK_ATRIBUTI = ['id', 'ime', 'prezime', 'username'];
+
+// VAŽNO: vraćamo RAVNU listu SVIH komentara za nekretninu (bez obzira na dubinu
+// ugnježdenja). Frontend (detalji.js) sam slaže stablo na osnovu idVezanogKomentara,
+// pa ugnježdavanje na serveru ovdje ne samo da je nepotrebno nego i pravi problem:
+// Sequelize include može ugnijezditi samo fiksan broj nivoa, a odgovor na odgovor
+// (nivo 2+) se onda nikad ne bi vratio klijentu.
 exports.getKomentariZaNekretninu = async (req, res) => {
   try {
     const komentari = await Komentar.findAll({
       where: { NekretninaId: req.params.id },
-      include: [
-        { 
-          model: Korisnik, 
-          attributes: ['id', 'korisnickoIme', 'ime', 'prezime'] 
-        },
-        { 
-          model: Komentar, 
-          as: 'Odgovori', // <--- OVO JE KLJUČNO DA SE POVUKU PODKOMENTARI
-          include: [
-            { 
-              model: Korisnik, 
-              attributes: ['id', 'korisnickoIme', 'ime', 'prezime'] 
-            }
-          ]
-        }
-      ],
-      order: [['createdAt', 'ASC']]
+      include: [{ model: Korisnik, attributes: KORISNIK_ATRIBUTI }],
+      order: [['createdAt', 'ASC']],
     });
     res.status(200).json(komentari);
   } catch (error) {
@@ -35,15 +27,26 @@ exports.createKomentar = async (req, res) => {
     if (!req.session.userId) {
       return res.status(401).json({ greska: 'Neautorizovan pristup. Molimo prijavite se.' });
     }
+    if (!tekst || !tekst.trim()) {
+      return res.status(400).json({ greska: 'Komentar ne smije biti prazan.' });
+    }
+
+    const nekretnina = await Nekretnina.findByPk(req.params.id);
+    if (!nekretnina) {
+      return res.status(404).json({ greska: 'Nekretnina nije pronađena.' });
+    }
+    if (nekretnina.kupljeno) {
+      return res.status(400).json({ greska: 'Nekretnina je već prodana, komentarisanje više nije moguće.' });
+    }
 
     const komentar = await Komentar.create({
-      tekst,
+      tekst: tekst.trim(),
       NekretninaId: req.params.id,
-      KorisnikId: req.session.userId
+      KorisnikId: req.session.userId,
     });
 
     const kreiraniKomentar = await Komentar.findByPk(komentar.id, {
-      include: [{ model: Korisnik, attributes: ['id', 'korisnickoIme', 'ime', 'prezime'] }]
+      include: [{ model: Korisnik, attributes: KORISNIK_ATRIBUTI }],
     });
 
     res.status(201).json(kreiraniKomentar);
@@ -53,36 +56,84 @@ exports.createKomentar = async (req, res) => {
   }
 };
 
-exports.createOdgovorNaKomentar = async (req, res) => {
+exports.createOdgovor = async (req, res) => {
+  const { tekst } = req.body;
   try {
-    const { tekst } = req.body;
-    // Sigurno preuzimamo komentar_id bez obzira kako je nazvan u ruti
-    const roditeljId = req.params.komentar_id || req.params.id; 
-    
-    const korisnikId = req.session.userId; 
-    if (!korisnikId) {
-      return res.status(401).json({ greska: 'Neautorizovan pristup.' });
+    if (!req.session.userId) {
+      return res.status(401).json({ greska: 'Neautorizovan pristup. Molimo prijavite se.' });
+    }
+    if (!tekst || !tekst.trim()) {
+      return res.status(400).json({ greska: 'Odgovor ne smije biti prazan.' });
     }
 
-    const glavniKomentar = await Komentar.findByPk(roditeljId);
-    if (!glavniKomentar) {
+    const nekretnina = await Nekretnina.findByPk(req.params.id);
+    if (!nekretnina) {
+      return res.status(404).json({ greska: 'Nekretnina nije pronađena.' });
+    }
+    if (nekretnina.kupljeno) {
+      return res.status(400).json({ greska: 'Nekretnina je već prodana, komentarisanje više nije moguće.' });
+    }
+
+    const roditeljKomentar = await Komentar.findByPk(req.params.komentarId);
+    if (!roditeljKomentar) {
       return res.status(404).json({ greska: 'Komentar na koji se odgovara ne postoji.' });
     }
 
-    const noviOdgovor = await Komentar.create({
-      tekst,
-      KorisnikId: korisnikId,
-      NekretninaId: glavniKomentar.NekretninaId,
-      idVezanogKomentara: roditeljId
+    const odgovor = await Komentar.create({
+      tekst: tekst.trim(),
+      NekretninaId: req.params.id,
+      KorisnikId: req.session.userId,
+      idVezanogKomentara: roditeljKomentar.id,
     });
 
-    const kreiraniOdgovor = await Komentar.findByPk(noviOdgovor.id, {
-      include: [{ model: Korisnik, attributes: ['id', 'korisnickoIme', 'ime', 'prezime'] }]
+    const kreiraniOdgovor = await Komentar.findByPk(odgovor.id, {
+      include: [{ model: Korisnik, attributes: KORISNIK_ATRIBUTI }],
     });
 
     res.status(201).json(kreiraniOdgovor);
   } catch (error) {
     console.error('Greška pri kreiranju odgovora:', error);
-    res.status(500).json({ greska: error.message });
+    res.status(500).json({ greska: 'Internal Server Error' });
+  }
+};
+
+// Admin briše komentar (i sve njegove odgovore, rekurzivno, da ne ostanu osiročeni)
+exports.deleteKomentar = async (req, res) => {
+  try {
+    const komentar = await Komentar.findByPk(req.params.id);
+    if (!komentar) {
+      return res.status(404).json({ greska: 'Komentar nije pronađen.' });
+    }
+
+    await obrisiKomentarSaOdgovorima(komentar.id);
+
+    res.status(200).json({ poruka: 'Komentar je uspješno obrisan.' });
+  } catch (error) {
+    console.error('Greška pri brisanju komentara:', error);
+    res.status(500).json({ greska: 'Internal Server Error' });
+  }
+};
+
+async function obrisiKomentarSaOdgovorima(id) {
+  const djeca = await Komentar.findAll({ where: { idVezanogKomentara: id } });
+  for (const dijete of djeca) {
+    await obrisiKomentarSaOdgovorima(dijete.id);
+  }
+  await Komentar.destroy({ where: { id } });
+}
+
+exports.getSviKomentari = async (req, res) => {
+  try {
+    const komentari = await Komentar.findAll({
+      include: [
+        { model: Korisnik, attributes: KORISNIK_ATRIBUTI },
+        { model: Nekretnina, attributes: ['id', 'naziv'] },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
+    res.status(200).json(komentari);
+  } catch (error) {
+    console.error('Greška pri dohvatanju svih komentara:', error);
+    res.status(500).json({ greska: 'Internal Server Error' });
   }
 };

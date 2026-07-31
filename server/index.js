@@ -33,7 +33,8 @@ app.use('/api', routes);
 // HTML Routes
 const htmlRoutes = [
   'nekretnine.html', 'detalji.html', 'meni.html', 'prijava.html', 'registracija.html',
-  'profil.html', 'statistika.html', 'ponude.html', 'mojiUpiti.html', 'admin.html', 'index.html'
+  'profil.html', 'statistika.html', 'ponude.html', 'mojiUpiti.html', 'admin.html',
+  'arhiva.html', 'index.html'
 ];
 
 htmlRoutes.forEach(file => {

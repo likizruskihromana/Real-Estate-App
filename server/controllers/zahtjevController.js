@@ -10,6 +10,9 @@ exports.createZahtjev = async (req, res) => {
     if (!nekretnina) {
       return res.status(404).json({ greska: 'Nekretnina nije pronađena.' });
     }
+    if (nekretnina.kupljeno) {
+      return res.status(400).json({ greska: 'Nekretnina je već prodana, zahtjevi za pregled više nisu mogući.' });
+    }
     if (!req.session.userId) {
       return res.status(401).json({ greska: 'Neautorizovan pristup. Molimo prijavite se.' });
     }

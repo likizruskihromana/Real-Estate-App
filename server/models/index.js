@@ -51,6 +51,9 @@ Komentar.belongsTo(Korisnik);
 Komentar.hasMany(Komentar, { as: 'Odgovori', foreignKey: 'idVezanogKomentara' });
 Komentar.belongsTo(Komentar, { as: 'GlavniKomentar', foreignKey: 'idVezanogKomentara' });
 
+// Kupac nekretnine (postavlja se kad se prihvati ponuda)
+Nekretnina.belongsTo(Korisnik, { as: 'Kupac', foreignKey: 'kupacId' });
+
 Nekretnina.prototype.getInteresovanja = async function () {
   const [upiti, zahtjevi, ponude] = await Promise.all([
     this.getUpiti(),

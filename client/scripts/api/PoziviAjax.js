@@ -423,6 +423,49 @@ const PoziviAjax = (() => {
         });
     }
 
+    function impl_prihvatiPonudu(ponuda_id, fnCallback) {
+        ajaxRequest('PUT', `${API_BASE_URL}/api/ponude/${ponuda_id}/prihvati`, {}, (error, data) => {
+            if (error) { fnCallback(error, null); return; }
+            try { fnCallback(null, JSON.parse(data)); } catch (e) { fnCallback(e, null); }
+        });
+    }
+    function impl_obrisiKomentar(komentar_id, fnCallback) {
+        ajaxRequest('DELETE', `${API_BASE_URL}/api/admin/komentari/${komentar_id}`, null, (error, data) => {
+            if (error) { fnCallback(error, null); return; }
+            try { fnCallback(null, JSON.parse(data)); } catch (e) { fnCallback(e, null); }
+        });
+    }
+    function impl_getMojePonude(fnCallback) {
+        ajaxRequest('GET', `${API_BASE_URL}/api/ponude/moje`, null, (error, data) => {
+            if (error) { fnCallback(error, null); return; }
+            try { fnCallback(null, JSON.parse(data)); } catch (e) { fnCallback(e, null); }
+        });
+    }
+    function impl_getAdminDashboard(fnCallback) {
+        ajaxRequest('GET', `${API_BASE_URL}/api/admin/dashboard`, null, (error, data) => {
+            if (error) { fnCallback(error, null); return; }
+            try { fnCallback(null, JSON.parse(data)); } catch (e) { fnCallback(e, null); }
+        });
+    }
+    function impl_getAdminKomentari(fnCallback) {
+        ajaxRequest('GET', `${API_BASE_URL}/api/admin/komentari`, null, (error, data) => {
+            if (error) { fnCallback(error, null); return; }
+            try { fnCallback(null, JSON.parse(data)); } catch (e) { fnCallback(e, null); }
+        });
+    }
+    function impl_getAdminPonude(fnCallback) {
+        ajaxRequest('GET', `${API_BASE_URL}/api/admin/ponude`, null, (error, data) => {
+            if (error) { fnCallback(error, null); return; }
+            try { fnCallback(null, JSON.parse(data)); } catch (e) { fnCallback(e, null); }
+        });
+    }
+    function impl_getArhiva(fnCallback) {
+        ajaxRequest('GET', `${API_BASE_URL}/api/nekretnine/arhiva`, null, (error, data) => {
+            if (error) { fnCallback(error, null); return; }
+            try { fnCallback(null, JSON.parse(data)); } catch (e) { fnCallback(e, null); }
+        });
+    }
+
     return {
         postLogin: impl_postLogin,
         postLogout: impl_postLogout,
@@ -445,11 +488,18 @@ const PoziviAjax = (() => {
         postNekretninaZahtjev: impl_postNekretninaZahtjev,
         putNekretninaZahtjevZid: impl_putNekretninaZahtjevZid,
         getPonude: impl_getPonude,
+        getMojePonude: impl_getMojePonude,
+        prihvatiPonudu: impl_prihvatiPonudu,
+        obrisiKomentar: impl_obrisiKomentar,
         getAdminKorisnici: impl_getAdminKorisnici,
         patchAdminStatus: impl_patchAdminStatus,
         deleteAdminKorisnik: impl_deleteAdminKorisnik,
         getAdminNekretnine: impl_getAdminNekretnine,
         getAdminZahtjevi: impl_getAdminZahtjevi,
+        getAdminDashboard: impl_getAdminDashboard,
+        getAdminKomentari: impl_getAdminKomentari,
+        getAdminPonude: impl_getAdminPonude,
+        getArhiva: impl_getArhiva,
         odgovoriNaPonudu: impl_odgovoriNaPonudu,
         getKomentari: impl_getKomentari,
         dodajKomentar: impl_dodajKomentar,
