@@ -1,11 +1,16 @@
 let trenutniKorisnik = null;
 let sveNekretnine = [];
+let omiljeniIds = new Set();
 
 window.addEventListener('DOMContentLoaded', () => {
     PoziviAjax.getKorisnik((err, user) => {
         trenutniKorisnik = err ? null : user;
-        ucitajNekretnine();
         postaviModal();
+        if (!trenutniKorisnik) return ucitajNekretnine();
+        PoziviAjax.getSacuvano((savedErr, saved) => {
+            if (!savedErr) omiljeniIds = new Set((saved.omiljene || []).map((item) => item.id));
+            ucitajNekretnine();
+        });
     });
     document.getElementById('filter-forma').addEventListener('submit', (event) => {
         event.preventDefault();
@@ -13,6 +18,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
     document.getElementById('ponisti-filtere').addEventListener('click', ponistiFiltere);
     document.getElementById('sortiranje').addEventListener('change', primijeniFiltere);
+    document.getElementById('sacuvaj-pretragu').addEventListener('click', sacuvajTrenutnuPretragu);
 });
 
 function ucitajNekretnine() {
@@ -33,6 +39,10 @@ function ucitajFiltereIzURL() {
     document.getElementById('filter-lokacija').value = params.get('lokacija') || '';
     document.getElementById('filter-tip').value = params.get('tip') || '';
     document.getElementById('filter-cijena').value = params.get('maxCijena') || '';
+    const sort = params.get('sortiranje');
+    if (['najnovije', 'cijena-asc', 'cijena-desc', 'kvadratura-desc'].includes(sort)) {
+        document.getElementById('sortiranje').value = sort;
+    }
 }
 
 function primijeniFiltere() {
@@ -78,6 +88,7 @@ function prikaziNekretnine(items) {
         return `<article class="catalog-card">
             <div class="catalog-card__image">
                 <img src="${slika ? Helpers.escapeHtml(slika.url) : '../resources/stan1.jpg'}" alt="${Helpers.escapeHtml(item.naziv)}">
+                <button type="button" class="favorite-button ${omiljeniIds.has(item.id) ? 'is-favorite' : ''}" data-id="${item.id}" aria-label="${omiljeniIds.has(item.id) ? 'Ukloni iz omiljenih' : 'Dodaj u omiljene'}" title="${omiljeniIds.has(item.id) ? 'Ukloni iz omiljenih' : 'Dodaj u omiljene'}">${omiljeniIds.has(item.id) ? '♥' : '♡'}</button>
                 <span class="catalog-card__type">${Helpers.escapeHtml(item.tip_nekretnine)}</span>
                 ${(item.Slike || []).length > 1 ? `<span class="catalog-card__photo-count">${item.Slike.length} fotografija</span>` : ''}
             </div>
@@ -94,6 +105,42 @@ function prikaziNekretnine(items) {
         otvoriModalZaUredjivanje(sveNekretnine.find((item) => String(item.id) === button.dataset.id));
     }));
     list.querySelectorAll('.dugme-obrisi').forEach((button) => button.addEventListener('click', () => obrisiNekretninu(button.dataset.id)));
+    list.querySelectorAll('.favorite-button').forEach((button) => button.addEventListener('click', () => toggleOmiljena(Number(button.dataset.id))));
+}
+
+function toggleOmiljena(id) {
+    if (!trenutniKorisnik) {
+        location.href = 'prijava.html';
+        return;
+    }
+    const uklanja = omiljeniIds.has(id);
+    const poziv = uklanja ? PoziviAjax.ukloniOmiljenu : PoziviAjax.dodajOmiljenu;
+    poziv(id, (err) => {
+        if (err) return alert(err.statusText || 'Sačuvanu nekretninu nije moguće ažurirati.');
+        if (uklanja) omiljeniIds.delete(id);
+        else omiljeniIds.add(id);
+        primijeniFiltere();
+    });
+}
+
+function sacuvajTrenutnuPretragu() {
+    if (!trenutniKorisnik) {
+        location.href = 'prijava.html';
+        return;
+    }
+    const naziv = prompt('Kako želite nazvati ovu pretragu?', 'Moja pretraga');
+    if (!naziv?.trim()) return;
+    const podaci = {
+        naziv: naziv.trim(),
+        lokacija: document.getElementById('filter-lokacija').value.trim() || null,
+        tip: document.getElementById('filter-tip').value || null,
+        maxCijena: document.getElementById('filter-cijena').value || null,
+        sortiranje: document.getElementById('sortiranje').value,
+    };
+    PoziviAjax.sacuvajPretragu(podaci, (err) => {
+        if (err) return alert(err.statusText || 'Pretragu nije moguće sačuvati.');
+        alert('Pretraga je sačuvana. Možete je otvoriti kroz stranicu „Sačuvano“.');
+    });
 }
 
 function obrisiNekretninu(id) {

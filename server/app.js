@@ -49,6 +49,7 @@ function createApp({ sessionStore, serveStatic = true } = {}) {
       'nekretnine.html', 'detalji.html', 'meni.html', 'prijava.html', 'registracija.html',
       'profil.html', 'statistika.html', 'ponude.html', 'mojiUpiti.html', 'admin.html',
       'arhiva.html', 'index.html',
+      'sacuvano.html',
     ];
     htmlRoutes.forEach((file) => {
       app.get(`/${file}`, (req, res) => res.sendFile(path.join(__dirname, '../client/html', file)));

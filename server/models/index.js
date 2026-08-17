@@ -20,6 +20,8 @@ const Zahtjev = require('./Zahtjev')(sequelize);
 const Ponuda = require('./Ponuda')(sequelize);
 const Komentar = require('./Komentar')(sequelize); // <-- DODANO
 const SlikaNekretnine = require('./SlikaNekretnine')(sequelize);
+const OmiljenaNekretnina = require('./OmiljenaNekretnina')(sequelize);
+const SacuvanaPretraga = require('./SacuvanaPretraga')(sequelize);
 
 // Veze
 Korisnik.hasMany(Nekretnina);
@@ -58,6 +60,23 @@ Nekretnina.belongsTo(Korisnik, { as: 'Kupac', foreignKey: 'kupacId' });
 Nekretnina.hasMany(SlikaNekretnine, { as: 'Slike', foreignKey: 'NekretninaId', onDelete: 'CASCADE' });
 SlikaNekretnine.belongsTo(Nekretnina, { foreignKey: 'NekretninaId' });
 
+Korisnik.belongsToMany(Nekretnina, {
+  through: OmiljenaNekretnina,
+  as: 'OmiljeneNekretnine',
+  foreignKey: 'KorisnikId',
+  otherKey: 'NekretninaId',
+});
+Nekretnina.belongsToMany(Korisnik, {
+  through: OmiljenaNekretnina,
+  as: 'Pratioci',
+  foreignKey: 'NekretninaId',
+  otherKey: 'KorisnikId',
+});
+OmiljenaNekretnina.belongsTo(Korisnik, { foreignKey: 'KorisnikId' });
+OmiljenaNekretnina.belongsTo(Nekretnina, { foreignKey: 'NekretninaId' });
+Korisnik.hasMany(SacuvanaPretraga, { as: 'SacuvanePretrage', foreignKey: 'KorisnikId', onDelete: 'CASCADE' });
+SacuvanaPretraga.belongsTo(Korisnik, { foreignKey: 'KorisnikId' });
+
 Nekretnina.prototype.getInteresovanja = async function () {
   const [upiti, zahtjevi, ponude] = await Promise.all([
     this.getUpiti(),
@@ -67,4 +86,7 @@ Nekretnina.prototype.getInteresovanja = async function () {
   return [...upiti, ...zahtjevi, ...ponude];
 };
 
-module.exports = { sequelize, Korisnik, Nekretnina, Upit, Zahtjev, Ponuda, Komentar, SlikaNekretnine };
+module.exports = {
+  sequelize, Korisnik, Nekretnina, Upit, Zahtjev, Ponuda, Komentar,
+  SlikaNekretnine, OmiljenaNekretnina, SacuvanaPretraga,
+};

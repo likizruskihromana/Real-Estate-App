@@ -504,6 +504,36 @@ const PoziviAjax = (() => {
             try { fnCallback(null, JSON.parse(data)); } catch (e) { fnCallback(e, null); }
         });
     }
+    function impl_getSacuvano(fnCallback) {
+        ajaxRequest('GET', `${API_BASE_URL}/api/sacuvano`, null, (error, data) => {
+            if (error) return fnCallback(error, null);
+            try { fnCallback(null, JSON.parse(data)); } catch (e) { fnCallback(e, null); }
+        });
+    }
+    function impl_dodajOmiljenu(nekretnina_id, fnCallback) {
+        ajaxRequest('POST', `${API_BASE_URL}/api/sacuvano/omiljene/${nekretnina_id}`, {}, (error, data) => {
+            if (error) return fnCallback(error, null);
+            try { fnCallback(null, JSON.parse(data)); } catch (e) { fnCallback(e, null); }
+        });
+    }
+    function impl_ukloniOmiljenu(nekretnina_id, fnCallback) {
+        ajaxRequest('DELETE', `${API_BASE_URL}/api/sacuvano/omiljene/${nekretnina_id}`, null, (error, data) => {
+            if (error) return fnCallback(error, null);
+            try { fnCallback(null, JSON.parse(data)); } catch (e) { fnCallback(e, null); }
+        });
+    }
+    function impl_sacuvajPretragu(podaci, fnCallback) {
+        ajaxRequest('POST', `${API_BASE_URL}/api/sacuvano/pretrage`, podaci, (error, data) => {
+            if (error) return fnCallback(error, null);
+            try { fnCallback(null, JSON.parse(data)); } catch (e) { fnCallback(e, null); }
+        });
+    }
+    function impl_obrisiSacuvanuPretragu(pretraga_id, fnCallback) {
+        ajaxRequest('DELETE', `${API_BASE_URL}/api/sacuvano/pretrage/${pretraga_id}`, null, (error, data) => {
+            if (error) return fnCallback(error, null);
+            try { fnCallback(null, JSON.parse(data)); } catch (e) { fnCallback(e, null); }
+        });
+    }
 
     return {
         postLogin: impl_postLogin,
@@ -542,6 +572,11 @@ const PoziviAjax = (() => {
         getAdminKomentari: impl_getAdminKomentari,
         getAdminPonude: impl_getAdminPonude,
         getArhiva: impl_getArhiva,
+        getSacuvano: impl_getSacuvano,
+        dodajOmiljenu: impl_dodajOmiljenu,
+        ukloniOmiljenu: impl_ukloniOmiljenu,
+        sacuvajPretragu: impl_sacuvajPretragu,
+        obrisiSacuvanuPretragu: impl_obrisiSacuvanuPretragu,
         odgovoriNaPonudu: impl_odgovoriNaPonudu,
         getKomentari: impl_getKomentari,
         dodajKomentar: impl_dodajKomentar,

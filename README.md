@@ -89,6 +89,10 @@ automatski; produkcijska baza treba sadržavati tu tabelu prije pokretanja.
 - `POST /api/nekretnine/:id/slike` - Upload fotografije (vlasnik/admin)
 - `PATCH /api/nekretnine/:id/slike/:slikaId/glavna` - Postavi glavnu fotografiju
 - `DELETE /api/nekretnine/:id/slike/:slikaId` - Obriši fotografiju
+- `GET /api/sacuvano` - Omiljene nekretnine i sačuvane pretrage
+- `POST|DELETE /api/sacuvano/omiljene/:id` - Dodaj ili ukloni omiljenu nekretninu
+- `POST /api/sacuvano/pretrage` - Sačuvaj aktivne filtere pretrage
+- `DELETE /api/sacuvano/pretrage/:id` - Obriši sačuvanu pretragu
 - `POST /api/upiti` - Dodaj upit
 - `GET /api/upiti/moji` - Moji upiti
 

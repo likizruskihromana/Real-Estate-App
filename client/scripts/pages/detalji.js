@@ -34,6 +34,7 @@ async function loadNekretninaDetalji(id) {
         nekretninaKupljena = !!nekretnina.kupljeno;
         displayGalerija(nekretnina);
         displayOsnovniPodaci(nekretnina);
+        postaviOmiljenuNaDetaljima(nekretnina.id);
         displayDetalji(nekretnina);
         loadTop5(nekretnina.lokacija);
         initUpitiCarousel(id, nekretnina.Upiti || []);
@@ -76,10 +77,40 @@ function displayOsnovniPodaci(nekretnina) {
         <p class="summary-location">${e(nekretnina.lokacija)}</p>
         <p class="summary-price">${Helpers.formatPrice(nekretnina.cijena)}</p>
         <div class="summary-facts"><span>${nekretnina.kvadratura} m²</span><span>${e(nekretnina.tip_grijanja || 'Grijanje n/a')}</span><span>${nekretnina.godina_izgradnje || 'Godina n/a'}</span></div>
+        <button type="button" id="detail-favorite" class="detail-favorite">♡ Sačuvaj nekretninu</button>
         ${nekretnina.kupljeno ? `<p class="napomena-prodano">Prodano ${Helpers.formatDate(nekretnina.datumKupovine)} za ${Helpers.formatPrice(nekretnina.prodajnaCijena)}.</p>` : ''}
     `;
 
     document.title = `${nekretnina.naziv} — Domus`;
+}
+
+function postaviOmiljenuNaDetaljima(nekretninaId) {
+    const button = document.getElementById('detail-favorite');
+    if (!button) return;
+    PoziviAjax.getKorisnik((userErr, user) => {
+        if (userErr || !user) {
+            button.addEventListener('click', () => { location.href = 'prijava.html'; });
+            return;
+        }
+        PoziviAjax.getSacuvano((savedErr, saved) => {
+            let sacuvana = !savedErr && (saved.omiljene || []).some(item => item.id === nekretninaId);
+            const osvjezi = () => {
+                button.classList.toggle('is-favorite', sacuvana);
+                button.textContent = sacuvana ? '♥ Sačuvana nekretnina' : '♡ Sačuvaj nekretninu';
+            };
+            osvjezi();
+            button.addEventListener('click', () => {
+                const poziv = sacuvana ? PoziviAjax.ukloniOmiljenu : PoziviAjax.dodajOmiljenu;
+                button.disabled = true;
+                poziv(nekretninaId, (err) => {
+                    button.disabled = false;
+                    if (err) return alert(err.statusText || 'Sačuvanu nekretninu nije moguće ažurirati.');
+                    sacuvana = !sacuvana;
+                    osvjezi();
+                });
+            });
+        });
+    });
 }
 
 function displayDetalji(nekretnina) {

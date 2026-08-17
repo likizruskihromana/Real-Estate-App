@@ -3,8 +3,9 @@ const { sequelize } = require('../models');
 const config = require('../config/env');
 const initialSchema = require('./001-initial-schema');
 const propertyImages = require('./002-property-images');
+const savedItems = require('./003-saved-items');
 
-const migrations = [initialSchema, propertyImages];
+const migrations = [initialSchema, propertyImages, savedItems];
 
 async function osigurajMetaTabelu(queryInterface) {
   const tabele = (await queryInterface.showAllTables()).map(String).map((ime) => ime.toLowerCase());
