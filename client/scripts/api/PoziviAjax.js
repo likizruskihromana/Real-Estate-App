@@ -1,9 +1,17 @@
 const PoziviAjax = (() => {
-    const API_BASE_URL = 'http://localhost:3000';
+    const API_BASE_URL = window.location.origin;
+    function getCookie(name) {
+        const prefix = `${name}=`;
+        const cookie = document.cookie.split(';').map(dio => dio.trim()).find(dio => dio.startsWith(prefix));
+        return cookie ? decodeURIComponent(cookie.substring(prefix.length)) : '';
+    }
     function ajaxRequest(method, url, data, callback) {
         const xhr = new XMLHttpRequest();
         xhr.open(method, url, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
+        if (!['GET', 'HEAD', 'OPTIONS'].includes(method.toUpperCase())) {
+            xhr.setRequestHeader('X-CSRF-Token', getCookie('nekretnine.csrf'));
+        }
         
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4) {
@@ -377,6 +385,7 @@ const PoziviAjax = (() => {
         };
         ajax.open("PUT", `${API_BASE_URL}/api/ponude/${idPonude}`, true);
         ajax.setRequestHeader("Content-Type", "application/json");
+        ajax.setRequestHeader('X-CSRF-Token', getCookie('nekretnine.csrf'));
         ajax.send(JSON.stringify({ odbijenaPonuda: odbijenaPonuda }));
     }
 

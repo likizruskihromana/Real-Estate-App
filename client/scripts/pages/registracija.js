@@ -50,6 +50,10 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     function showError(message) {
-        areaBelow.innerHTML = `<p class="error-message">${message}</p>`;
+        areaBelow.replaceChildren();
+        const poruka = document.createElement('p');
+        poruka.className = 'error-message';
+        poruka.textContent = message;
+        areaBelow.appendChild(poruka);
     }
 });

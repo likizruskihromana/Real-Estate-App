@@ -1,4 +1,4 @@
-const { Nekretnina, Upit, Zahtjev, Ponuda, Korisnik } = require('../models');
+const { sequelize, Nekretnina, Upit, Zahtjev, Ponuda, Korisnik, Komentar } = require('../models');
 
 const DOZVOLJENI_TIPOVI = ['Stan', 'Kuća', 'Poslovni prostor'];
 
@@ -147,14 +147,20 @@ exports.remove = async (req, res) => {
       return res.status(403).json({ greska: 'Nemate prava da obrišete ovu nekretninu.' });
     }
 
-    // Prvo obriši sve vezane upite/zahtjeve/ponude da ne ostanu osiročeni zapisi
-    await Promise.all([
-      Upit.destroy({ where: { NekretninaId: nekretnina.id } }),
-      Zahtjev.destroy({ where: { NekretninaId: nekretnina.id } }),
-      Ponuda.destroy({ where: { NekretninaId: nekretnina.id } }),
-    ]);
-
-    await nekretnina.destroy();
+    await sequelize.transaction(async (transaction) => {
+      // Prvo prekini self-reference, zatim ukloni sve komentare u istoj transakciji.
+      await Komentar.update(
+        { idVezanogKomentara: null },
+        { where: { NekretninaId: nekretnina.id }, transaction }
+      );
+      await Komentar.destroy({ where: { NekretninaId: nekretnina.id }, transaction });
+      await Promise.all([
+        Upit.destroy({ where: { NekretninaId: nekretnina.id }, transaction }),
+        Zahtjev.destroy({ where: { NekretninaId: nekretnina.id }, transaction }),
+        Ponuda.destroy({ where: { NekretninaId: nekretnina.id }, transaction }),
+      ]);
+      await nekretnina.destroy({ transaction });
+    });
     res.status(200).json({ poruka: 'Nekretnina je uspješno obrisana.' });
   } catch (error) {
     console.error('Error deleting property:', error);
@@ -168,7 +174,6 @@ exports.getById = async (req, res) => {
       include: [
         { model: Upit, as: 'Upiti', limit: 3, order: [['id', 'DESC']], separate: true },
         { model: Zahtjev, as: 'Zahtjevi' },
-        { model: Ponuda, as: 'Ponude' },
       ],
     });
 

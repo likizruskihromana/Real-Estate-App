@@ -33,7 +33,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     return `
                         <div class="arhiva-kartica">
                             <div class="arhiva-kartica-header">
-                                <h3>${n.naziv}</h3>
+                                <h3>${Helpers.escapeHtml(n.naziv)}</h3>
                                 <span class="oznaka-prodano-mala">PRODANO</span>
                             </div>
                             <div class="arhiva-detalji">
@@ -43,7 +43,7 @@ window.addEventListener('DOMContentLoaded', () => {
                                 </div>
                                 <div class="arhiva-red">
                                     <span class="arhiva-labela">Lokacija:</span>
-                                    <span>${n.lokacija}</span>
+                                    <span>${Helpers.escapeHtml(n.lokacija)}</span>
                                 </div>
                                 <div class="arhiva-red">
                                     <span class="arhiva-labela">Kvadratura:</span>

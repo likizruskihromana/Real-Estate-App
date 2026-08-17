@@ -1242,7 +1242,7 @@ async function seedDatabase() {
         tekst: kData.tekst,
         KorisnikId: korisnik.id,
         NekretninaId: nekretninaId,
-        KomentarId: parentId
+        idVezanogKomentara: parentId
       });
 
       if (kData.odgovori && kData.odgovori.length > 0) {

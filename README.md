@@ -16,6 +16,9 @@ npm start
 npm run dev
 ```
 
+Server pri pokretanju ne kreira niti resetuje bazu. Za praznu razvojnu bazu
+pokrenite `npm run seed` eksplicitno; naredba će se zaustaviti ako podaci već postoje.
+
 ### Sa Dockerom
 ```bash
 # Build i pokreni
@@ -38,6 +41,8 @@ docker-compose down -v
 - **Frontend**: Vanilla JavaScript, HTML, CSS
 - **DevOps**: Docker, Docker Compose
 
+Za lokalni razvoj potreban je Node.js 22 ili noviji podržani LTS runtime.
+
 ## 📁 Struktura Projekta
 
 ```
@@ -47,12 +52,18 @@ docker-compose down -v
 
 ## 🔐 Default Credentials
 
-- **Admin**: username: `admin`, password: `admin`
-- **User**: username: `user`, password: `user`
+- **Admin (samo razvojni seed)**: username: `admin`, password: `admin`
+- **User (samo razvojni seed)**: username: `user`, password: `user`
 
 ## 📝 Environment Variables
 
 Kopiraj `.env.example` u `.env` i podesi varijable.
+
+`.env` se ne smije commitovati. U produkciji obavezno postavite dugačak,
+nasumičan `SESSION_SECRET` i zasebnog MySQL korisnika bez root privilegija.
+
+Sesije se čuvaju u MySQL tabeli `sessions`. Razvojni režim je može kreirati
+automatski; produkcijska baza treba sadržavati tu tabelu prije pokretanja.
 
 ## 🛠️ API Endpoints
 

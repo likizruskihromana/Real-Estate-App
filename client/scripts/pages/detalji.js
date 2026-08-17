@@ -38,8 +38,9 @@ async function loadNekretninaDetalji(id) {
 }
 
 function displayOsnovniPodaci(nekretnina) {
+    const e = Helpers.escapeHtml;
     document.getElementById('osnovno').innerHTML = `
-        <h1><strong> ${nekretnina.naziv}</strong> ${nekretnina.kupljeno ? '<span class="oznaka-prodano">PRODANO</span>' : ''}</h1>
+        <h1><strong> ${e(nekretnina.naziv)}</strong> ${nekretnina.kupljeno ? '<span class="oznaka-prodano">PRODANO</span>' : ''}</h1>
         <p><strong>Kvadratura:</strong> ${nekretnina.kvadratura} m²</p>
         <p><strong>Cijena:</strong> ${Helpers.formatPrice(nekretnina.cijena)}</p>
         ${nekretnina.kupljeno ? `<p class="napomena-prodano">Prodano ${Helpers.formatDate(nekretnina.datumKupovine)} za ${Helpers.formatPrice(nekretnina.prodajnaCijena)}.</p>` : ''}
@@ -47,12 +48,13 @@ function displayOsnovniPodaci(nekretnina) {
 }
 
 function displayDetalji(nekretnina) {
+    const e = Helpers.escapeHtml;
     document.getElementById('detalji').innerHTML = `
-        <p><strong>Tip grijanja: </strong> ${nekretnina.tip_grijanja}</p>
-        <p><strong>Lokacija: </strong> ${nekretnina.lokacija}</p>
+        <p><strong>Tip grijanja: </strong> ${e(nekretnina.tip_grijanja)}</p>
+        <p><strong>Lokacija: </strong> ${e(nekretnina.lokacija)}</p>
         <p><strong>Godina izgradnje: </strong> ${nekretnina.godina_izgradnje}</p>
         <p><strong>Datum objave: </strong> ${Helpers.formatDate(nekretnina.datum_objave)}</p>
-        <p><strong>Opis: </strong> ${nekretnina.opis}</p>
+        <p><strong>Opis: </strong> ${e(nekretnina.opis)}</p>
     `;
 }
 
@@ -67,8 +69,8 @@ function loadTop5(lokacija) {
         container.innerHTML = top5.map(n => `
             <a href="/detalji.html?id=${n.id}" class="nekretnina-card-link" style="text-decoration: none; color: inherit;">
                 <div class="nekretnina-item">
-                    <p><strong>${n.naziv}</strong></p>
-                    <p>${n.lokacija} - ${Helpers.formatPrice(n.cijena)}</p>
+                    <p><strong>${Helpers.escapeHtml(n.naziv)}</strong></p>
+                    <p>${Helpers.escapeHtml(n.lokacija)} - ${Helpers.formatPrice(n.cijena)}</p>
                 </div>
             </a>
         `).join('');
@@ -89,7 +91,7 @@ function initUpitiCarousel(nekretninaId, prvaTriUpita) {
             if (upiti && upiti[i]) {
                 const u = upiti[i];
                 const autorIme = u.Korisnik ? (u.Korisnik.ime ? `${u.Korisnik.ime} ${u.Korisnik.prezime}` : u.Korisnik.username) : 'Korisnik';
-                sviElementi[i].innerHTML = `<p><strong>${autorIme}:</strong> ${u.tekst}</p>`;
+                sviElementi[i].innerHTML = `<p><strong>${Helpers.escapeHtml(autorIme)}:</strong> ${Helpers.escapeHtml(u.tekst)}</p>`;
             } else {
                 sviElementi[i].innerHTML = '<p>Nema više upita</p>';
             }
@@ -162,10 +164,10 @@ function prikaziListuInteresovanja(interesovanja, trenutniKorisnik) {
         const autorIme = u.Korisnik ? (u.Korisnik.ime ? `${u.Korisnik.ime} ${u.Korisnik.prezime}` : u.Korisnik.username) : 'Korisnik';
         return `
             <div class="interesovanje-item">
-                <p><strong>#${u.id} — Upit</strong> (Autor: ${autorIme})</p>
-                <p>${u.tekst}</p>
+                <p><strong>#${u.id} — Upit</strong> (Autor: ${Helpers.escapeHtml(autorIme)})</p>
+                <p>${Helpers.escapeHtml(u.tekst)}</p>
                 ${u.odgovor
-                    ? `<p class="odgovor-vlasnika"><strong>Odgovor:</strong> ${u.odgovor}</p>`
+                    ? `<p class="odgovor-vlasnika"><strong>Odgovor:</strong> ${Helpers.escapeHtml(u.odgovor)}</p>`
                     : (mozeOdgovarati ? `
                         <form class="forma-odgovor" data-tip="upit" data-id="${u.id}">
                             <textarea placeholder="Napišite odgovor..." required></textarea>
@@ -179,11 +181,11 @@ const zahtjevi = (interesovanja.zahtjevi || []).map(z => {
         const autorIme = z.Korisnik ? (z.Korisnik.ime ? `${z.Korisnik.ime} ${z.Korisnik.prezime}` : z.Korisnik.username) : 'Korisnik';
         return `
             <div class="interesovanje-item ${z.odobren ? 'odobren' : ''}">
-                <p><strong>#${z.id} — Zahtjev za pregled</strong> (Autor: ${autorIme})</p>
-                <p>${z.tekst}</p>
+                <p><strong>#${z.id} — Zahtjev za pregled</strong> (Autor: ${Helpers.escapeHtml(autorIme)})</p>
+                <p>${Helpers.escapeHtml(z.tekst)}</p>
                 <p>Traženi datum: ${Helpers.formatDate(z.trazeniDatum)}</p>
                 <p>Status: ${z.odobren ? 'Odobren' : 'Na čekanju / nije odobren'}</p>
-                ${z.odgovor ? `<p class="odgovor-vlasnika"><strong>Odgovor:</strong> ${z.odgovor}</p>` : ''}
+                ${z.odgovor ? `<p class="odgovor-vlasnika"><strong>Odgovor:</strong> ${Helpers.escapeHtml(z.odgovor)}</p>` : ''}
                 ${(mozeOdgovarati && !z.odobren) ? `
                     <form class="forma-odgovor" data-tip="zahtjev" data-id="${z.id}">
                         <textarea placeholder="Napišite odgovor (opciono)..."></textarea>
@@ -206,7 +208,7 @@ const zahtjevi = (interesovanja.zahtjevi || []).map(z => {
         return `
             <div class="interesovanje-item ${p.odbijenaPonuda ? 'odbijena' : ''} ${p.prihvacenaPonuda ? 'odobren' : ''}">
                 <p><strong>#${p.id} — Ponuda${p.idVezanePonude ? ` (odgovor na #${p.idVezanePonude})` : ''}</strong> (Ponuđač: ${ponudjacIme})</p>
-                <p>${p.tekst}</p>
+                <p>${Helpers.escapeHtml(p.tekst)}</p>
                 ${p.cijenaPonude !== undefined ? `<p>Cijena: ${Helpers.formatPrice(p.cijenaPonude)}</p>` : ''}
                 <p>Status: ${statusText}</p>
                 ${p.mozeOdgovoriti ? '<p class="napomena-ponuda">Možete odgovoriti na ovu ponudu putem forme ispod ("Odgovor na postojeću ponudu").</p>' : ''}
@@ -457,8 +459,8 @@ function prikaziListuKomentara(nekretninaId, komentari, trenutniKorisnik) {
 
         return `
             <div class="komentar-item" style="border-bottom: 1px solid #eee; padding: 10px 0; margin-bottom: 10px;" data-id="${k.id}">
-                <p><strong>${autor}:</strong></p>
-                <p>${k.tekst}</p>
+                <p><strong>${Helpers.escapeHtml(autor)}:</strong></p>
+                <p>${Helpers.escapeHtml(k.tekst)}</p>
                 ${tacnoVrijeme ? `<small style="color: #666; font-size: 11px;">Objavljeno: ${tacnoVrijeme}</small>` : ''}
                 
                 ${odgovoriHtml}

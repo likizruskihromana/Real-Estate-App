@@ -1,9 +1,18 @@
 const MarketingAjax = (() => {
 
+    function getCsrfToken() {
+        const prefix = 'nekretnine.csrf=';
+        const cookie = document.cookie.split(';').map(dio => dio.trim()).find(dio => dio.startsWith(prefix));
+        return cookie ? decodeURIComponent(cookie.substring(prefix.length)) : '';
+    }
+
     function ajaxRequest(method, url, data, callback) {
         const xhr = new XMLHttpRequest();
         xhr.open(method, url, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
+        if (!['GET', 'HEAD', 'OPTIONS'].includes(method.toUpperCase())) {
+            xhr.setRequestHeader('X-CSRF-Token', getCsrfToken());
+        }
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4) {
                 if (xhr.status === 200) {
@@ -92,7 +101,6 @@ const MarketingAjax = (() => {
 
     function impl_novoFiltriranje(listaFiltriranihNekretnina) {
         const requestBody = { nizNekretnina: listaFiltriranihNekretnina };
-        console.log(listaFiltriranihNekretnina)
         globalniNizNekretninaPretrage = [-1];
         ajaxRequest('POST', '/marketing/nekretnine', requestBody, (error, data) => {
             // Nema potrebe za pozivom fnCallback

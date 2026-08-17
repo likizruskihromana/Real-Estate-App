@@ -40,6 +40,15 @@ const Helpers = (() => {
         return password && password.length >= 6;
     }
 
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
     // Show/Hide elementi
     function showElement(elementId) {
         const el = document.getElementById(elementId);
@@ -64,7 +73,10 @@ function handleError(error, container) {
     console.error('Error:', error);
     if (container) {
         // Također dodaje grešku bez brisanja ostatka stranice
-        container.insertAdjacentHTML('beforeend', `<div class="error">Greška: ${error.statusText || 'Nepoznata greška'}</div>`);
+        const element = document.createElement('div');
+        element.className = 'error';
+        element.textContent = `Greška: ${error.statusText || 'Nepoznata greška'}`;
+        container.appendChild(element);
     }
 }
 
@@ -85,6 +97,7 @@ function handleError(error, container) {
         hideElement,
         showLoading,
         hideLoading,
-        handleError
+        handleError,
+        escapeHtml
     };
 })();

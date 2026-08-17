@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                                 <p><strong>Lokacija:</strong> ${p.nekretnina?.lokacija || "N/A"}</p>
                                                 <p><strong>Cijena:</strong> ${p.cijenaPonude} KM</p>
                                                 <p><strong>Datum:</strong> ${new Date(p.datumPonude).toLocaleDateString("bs-BA")}</p>
-                                                <p class="offer-text">${p.tekst}</p>
+                                                <p class="offer-text">${Helpers.escapeHtml(p.tekst)}</p>
                                             </div>
                                         </div>
                                     </a>

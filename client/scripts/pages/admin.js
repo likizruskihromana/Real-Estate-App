@@ -28,6 +28,14 @@ function setupTabovi() {
     });
 }
 
+function prikaziGresku(container, error) {
+    container.replaceChildren();
+    const poruka = document.createElement('div');
+    poruka.className = 'greska-poruka';
+    poruka.textContent = error?.statusText || 'Greška.';
+    container.appendChild(poruka);
+}
+
 // ==== DASHBOARD ====
 function ucitajDashboard() {
     PoziviAjax.getAdminDashboard((err, data) => {
@@ -67,7 +75,7 @@ function ucitajKorisnike() {
     container.innerHTML = '<div class="loading">Učitavanje...</div>';
 
     PoziviAjax.getAdminKorisnici((err, korisnici) => {
-        if (err) { container.innerHTML = `<div class="greska-poruka">${err.statusText || 'Greška.'}</div>`; return; }
+        if (err) { prikaziGresku(container, err); return; }
 
         container.innerHTML = `
             <table class="admin-tabela">
@@ -76,8 +84,8 @@ function ucitajKorisnike() {
                     ${korisnici.map(k => `
                         <tr>
                             <td>${k.id}</td>
-                            <td>${k.ime} ${k.prezime}</td>
-                            <td>@${k.username}</td>
+                            <td>${Helpers.escapeHtml(k.ime)} ${Helpers.escapeHtml(k.prezime)}</td>
+                            <td>@${Helpers.escapeHtml(k.username)}</td>
                             <td>${k.admin ? '<span class="oznaka oznaka-admin">Admin</span>' : '<span class="oznaka">Korisnik</span>'}</td>
                             <td class="kolona-akcije">
                                 ${k.id === trenutniKorisnik.id ? '<span class="napomena">(vi)</span>' : `
@@ -121,7 +129,7 @@ function ucitajNekretnine() {
     container.innerHTML = '<div class="loading">Učitavanje...</div>';
 
     PoziviAjax.getAdminNekretnine((err, nekretnine) => {
-        if (err) { container.innerHTML = `<div class="greska-poruka">${err.statusText || 'Greška.'}</div>`; return; }
+        if (err) { prikaziGresku(container, err); return; }
 
         container.innerHTML = `
             <table class="admin-tabela">
@@ -130,10 +138,10 @@ function ucitajNekretnine() {
                     ${nekretnine.map(n => `
                         <tr>
                             <td>${n.id}</td>
-                            <td>${n.naziv}</td>
-                            <td>${n.tip_nekretnine}</td>
+                            <td>${Helpers.escapeHtml(n.naziv)}</td>
+                            <td>${Helpers.escapeHtml(n.tip_nekretnine)}</td>
                             <td>${Helpers.formatPrice(n.cijena)}</td>
-                            <td>${n.Korisnik ? '@' + n.Korisnik.username : '—'}</td>
+                            <td>${n.Korisnik ? '@' + Helpers.escapeHtml(n.Korisnik.username) : '—'}</td>
                             <td>${n.kupljeno ? '<span class="oznaka oznaka-prodano-mala">Prodano</span>' : '<span class="oznaka">Aktivno</span>'}</td>
                             <td class="kolona-akcije">
                                 <a href="detalji.html?id=${n.id}" class="dugme-sekundarno" target="_top">Pogledaj</a>
@@ -163,7 +171,7 @@ function ucitajZahtjeve() {
     container.innerHTML = '<div class="loading">Učitavanje...</div>';
 
     PoziviAjax.getAdminZahtjevi((err, zahtjevi) => {
-        if (err) { container.innerHTML = `<div class="greska-poruka">${err.statusText || 'Greška.'}</div>`; return; }
+        if (err) { prikaziGresku(container, err); return; }
 
         container.innerHTML = `
             <table class="admin-tabela">
@@ -172,8 +180,8 @@ function ucitajZahtjeve() {
                     ${zahtjevi.map(z => `
                         <tr>
                             <td>${z.id}</td>
-                            <td>${z.Nekretnina ? z.Nekretnina.naziv : '—'}</td>
-                            <td>${z.Korisnik ? '@' + z.Korisnik.username : '—'}</td>
+                            <td>${z.Nekretnina ? Helpers.escapeHtml(z.Nekretnina.naziv) : '—'}</td>
+                            <td>${z.Korisnik ? '@' + Helpers.escapeHtml(z.Korisnik.username) : '—'}</td>
                             <td>${Helpers.formatDate(z.trazeniDatum)}</td>
                             <td>${z.odobren ? '<span class="oznaka oznaka-admin">Odobren</span>' : '<span class="oznaka">Na čekanju</span>'}</td>
                             <td class="kolona-akcije">
@@ -202,7 +210,7 @@ function ucitajPonude() {
     container.innerHTML = '<div class="loading">Učitavanje...</div>';
 
     PoziviAjax.getAdminPonude((err, ponude) => {
-        if (err) { container.innerHTML = `<div class="greska-poruka">${err.statusText || 'Greška.'}</div>`; return; }
+        if (err) { prikaziGresku(container, err); return; }
 
         container.innerHTML = `
             <table class="admin-tabela">
@@ -216,8 +224,8 @@ function ucitajPonude() {
                         return `
                             <tr>
                                 <td>${p.id}</td>
-                                <td>${p.Nekretnina ? p.Nekretnina.naziv : '—'}</td>
-                                <td>${p.Korisnik ? '@' + p.Korisnik.username : '—'}</td>
+                                <td>${p.Nekretnina ? Helpers.escapeHtml(p.Nekretnina.naziv) : '—'}</td>
+                                <td>${p.Korisnik ? '@' + Helpers.escapeHtml(p.Korisnik.username) : '—'}</td>
                                 <td>${p.cijenaPonude ? Helpers.formatPrice(p.cijenaPonude) : '—'}</td>
                                 <td><span class="oznaka ${statusKlasa}">${status}</span></td>
                                 <td>${p.idVezanePonude ? `#${p.idVezanePonude}` : '—'}</td>
@@ -236,7 +244,7 @@ function ucitajKomentare() {
     container.innerHTML = '<div class="loading">Učitavanje...</div>';
 
     PoziviAjax.getAdminKomentari((err, komentari) => {
-        if (err) { container.innerHTML = `<div class="greska-poruka">${err.statusText || 'Greška.'}</div>`; return; }
+        if (err) { prikaziGresku(container, err); return; }
 
         if (!komentari || komentari.length === 0) {
             container.innerHTML = '<p>Nema komentara.</p>';
@@ -250,9 +258,9 @@ function ucitajKomentare() {
                     ${komentari.map(k => `
                         <tr>
                             <td>${k.id}</td>
-                            <td>${k.Nekretnina ? `<a href="detalji.html?id=${k.NekretninaId}" target="_top">${k.Nekretnina.naziv}</a>` : '—'}</td>
-                            <td>${k.Korisnik ? '@' + k.Korisnik.username : '—'}</td>
-                            <td class="tekst-skracen">${k.tekst}</td>
+                            <td>${k.Nekretnina ? `<a href="detalji.html?id=${k.NekretninaId}" target="_top">${Helpers.escapeHtml(k.Nekretnina.naziv)}</a>` : '—'}</td>
+                            <td>${k.Korisnik ? '@' + Helpers.escapeHtml(k.Korisnik.username) : '—'}</td>
+                            <td class="tekst-skracen">${Helpers.escapeHtml(k.tekst)}</td>
                             <td>${k.idVezanogKomentara ? `#${k.idVezanogKomentara}` : '—'}</td>
                             <td class="kolona-akcije">
                                 <button type="button" class="dugme-opasnost" data-akcija="obrisi-komentar" data-id="${k.id}">Obriši</button>

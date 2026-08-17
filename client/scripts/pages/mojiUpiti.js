@@ -46,7 +46,7 @@ function ucitajUpite() {
                             <span class="kartica-tip">Upit</span>
                             <a href="detalji.html?id=${u.id_nekretnine}" class="kartica-link">Nekretnina #${u.id_nekretnine}</a>
                         </div>
-                        <p class="kartica-tekst">${u.tekst_upita}</p>
+                        <p class="kartica-tekst">${Helpers.escapeHtml(u.tekst_upita)}</p>
                         ${u.odgovor ? `<div class="kartica-odgovor"><strong>Odgovor vlasnika:</strong><p>${u.odgovor}</p></div>` : '<p class="kartica-ceka">Čeka odgovor...</p>'}
                         <a href="detalji.html?id=${u.id_nekretnine}" class="btn-kartica">Pogledaj nekretninu →</a>
                     </div>
@@ -84,9 +84,9 @@ function ucitajPonude() {
                         <div class="kartica ${statusKlasa}">
                             <div class="kartica-header">
                                 <span class="kartica-tip">Ponuda</span>
-                                ${nekretnina ? `<a href="detalji.html?id=${nekretnina.id}" class="kartica-link">${nekretnina.naziv}</a>` : ''}
+                                ${nekretnina ? `<a href="detalji.html?id=${nekretnina.id}" class="kartica-link">${Helpers.escapeHtml(nekretnina.naziv)}</a>` : ''}
                             </div>
-                            <p class="kartica-tekst">${p.tekst}</p>
+                            <p class="kartica-tekst">${Helpers.escapeHtml(p.tekst)}</p>
                             ${p.cijenaPonude ? `<p class="kartica-cijena">${Helpers.formatPrice(p.cijenaPonude)}</p>` : ''}
                             <p class="kartica-datum">Datum: ${Helpers.formatDate(p.datumPonude)}</p>
                             <div class="status-oznaka ${statusKlasa}">${statusTekst}</div>

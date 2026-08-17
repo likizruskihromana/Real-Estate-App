@@ -1,5 +1,6 @@
-const { Korisnik, Nekretnina, Zahtjev, Ponuda, Komentar } = require('../models');
+const { sequelize, Korisnik, Nekretnina, Zahtjev, Ponuda, Komentar } = require('../models');
 const komentarController = require('./komentarController');
+const validacija = require('../utils/validation');
 
 exports.getDashboard = async (req, res) => {
   try {
@@ -60,23 +61,38 @@ exports.getKorisnici = async (req, res) => {
 
 exports.setAdminStatus = async (req, res) => {
   try {
-    const { admin } = req.body;
-    const korisnik = await Korisnik.findByPk(req.params.id);
+    const admin = validacija.boolean(req.body.admin, 'Admin status');
+    const korisnikId = validacija.pozitivanId(req.params.id, 'ID korisnika');
+    let korisnik;
 
-    if (!korisnik) {
-      return res.status(404).json({ greska: 'Korisnik nije pronađen.' });
-    }
-
-    // Zaštita: ne dozvoli da se ukloni poslednji preostali admin
-    if (korisnik.admin && admin === false) {
-      const brojAdmina = await Korisnik.count({ where: { admin: true } });
-      if (brojAdmina <= 1) {
-        return res.status(400).json({ greska: 'Ne možete ukloniti poslednjeg administratora.' });
+    await sequelize.transaction(async (transaction) => {
+      korisnik = await Korisnik.findByPk(korisnikId, {
+        transaction,
+        lock: transaction.LOCK.UPDATE,
+      });
+      if (!korisnik) {
+        const error = new Error('Korisnik nije pronađen.');
+        error.status = 404;
+        throw error;
       }
-    }
 
-    korisnik.admin = !!admin;
-    await korisnik.save();
+      if (korisnik.admin && admin === false) {
+        const administratori = await Korisnik.findAll({
+          where: { admin: true },
+          attributes: ['id'],
+          transaction,
+          lock: transaction.LOCK.UPDATE,
+        });
+        if (administratori.length <= 1) {
+          const error = new Error('Ne možete ukloniti poslednjeg administratora.');
+          error.status = 400;
+          throw error;
+        }
+      }
+
+      korisnik.admin = admin;
+      await korisnik.save({ transaction });
+    });
 
     // Ako admin mijenja status samom sebi, sesija se mora odmah osvježiti
     // da ne bi ostao sa admin privilegijama u trenutnoj sesiji nakon samodegradacije.
@@ -92,6 +108,8 @@ exports.setAdminStatus = async (req, res) => {
       admin: korisnik.admin,
     });
   } catch (error) {
+    if (error.status) return res.status(error.status).json({ greska: error.message });
+    if (error.code === 'VALIDATION_ERROR') return res.status(400).json({ greska: error.message });
     console.error('Error updating admin status:', error);
     res.status(500).json({ greska: 'Internal Server Error' });
   }
@@ -99,7 +117,7 @@ exports.setAdminStatus = async (req, res) => {
 
 exports.deleteKorisnik = async (req, res) => {
   try {
-    const idZaBrisanje = parseInt(req.params.id);
+    const idZaBrisanje = validacija.pozitivanId(req.params.id, 'ID korisnika');
 
     if (idZaBrisanje === req.session.userId) {
       return res.status(400).json({ greska: 'Ne možete obrisati sopstveni nalog iz admin panela.' });

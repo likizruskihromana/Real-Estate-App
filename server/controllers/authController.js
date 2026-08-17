@@ -1,22 +1,40 @@
 const { Korisnik } = require('../models');
 const bcrypt = require('bcrypt');
 const config = require('../config/env');
+const validacija = require('../utils/validation');
+
+function regenerateSession(req) {
+  return new Promise((resolve, reject) => {
+    req.session.regenerate((error) => (error ? reject(error) : resolve()));
+  });
+}
+
+function postaviKorisnikaUSesiju(req, korisnik) {
+  req.session.username = korisnik.username;
+  req.session.userId = korisnik.id;
+  req.session.admin = korisnik.admin;
+}
 
 exports.register = async (req, res) => {
   const { ime, prezime, username, password } = req.body;
 
   try {
-    if (!ime || !ime.trim() || !prezime || !prezime.trim() || !username || !username.trim() || !password) {
+    if (
+      typeof ime !== 'string' || !ime.trim() ||
+      typeof prezime !== 'string' || !prezime.trim() ||
+      typeof username !== 'string' || !username.trim() ||
+      typeof password !== 'string' || !password
+    ) {
       return res.status(400).json({ greska: 'Sva polja su obavezna.' });
     }
 
     const cistUsername = username.trim();
-    if (cistUsername.length < 3 || /\s/.test(cistUsername)) {
-      return res.status(400).json({ greska: 'Korisničko ime mora imati bar 3 karaktera i ne smije sadržavati razmake.' });
+    if (cistUsername.length < 3 || cistUsername.length > 50 || /\s/.test(cistUsername)) {
+      return res.status(400).json({ greska: 'Korisničko ime mora imati 3–50 karaktera i ne smije sadržavati razmake.' });
     }
 
-    if (password.length < 6) {
-      return res.status(400).json({ greska: 'Lozinka mora imati bar 6 karaktera.' });
+    if (password.length < 6 || password.length > 128) {
+      return res.status(400).json({ greska: 'Lozinka mora imati između 6 i 128 karaktera.' });
     }
 
     const postojeci = await Korisnik.findOne({ where: { username: cistUsername } });
@@ -35,54 +53,40 @@ exports.register = async (req, res) => {
       admin: false,
     });
 
-    // Automatska prijava nakon uspješne registracije
-    req.session.username = korisnik.username;
-    req.session.userId = korisnik.id;
-    req.session.admin = korisnik.admin;
-    req.session.loginAttempts = 0;
+    // Novi ID sesije sprječava session-fixation i kod automatske prijave.
+    await regenerateSession(req);
+    postaviKorisnikaUSesiju(req, korisnik);
 
     res.status(201).json({ poruka: 'Uspješna registracija' });
   } catch (error) {
     if (error.name === 'SequelizeUniqueConstraintError') {
       return res.status(409).json({ greska: 'To korisničko ime je već zauzeto.' });
     }
-    console.error('Register error:', error);
-    res.status(500).json({ greska: 'Internal Server Error' });
+    validacija.odgovoriNaGresku(error, res, 'Register error:');
   }
 };
 
 exports.login = async (req, res) => {
   const { username, password } = req.body;
   try {
-    const korisnik = await Korisnik.findOne({ where: { username } });
+    if (
+      typeof username !== 'string' || typeof password !== 'string' ||
+      !username.trim() || !password || username.length > 50 || password.length > 128
+    ) {
+      return res.status(400).json({ greska: 'Korisničko ime i lozinka su obavezni.' });
+    }
+    const korisnik = await Korisnik.findOne({ where: { username: username.trim() } });
     if (!korisnik) {
       return res.status(401).json({ greska: 'Neispravni kredencijali.' });
     }
     const isPasswordValid = await bcrypt.compare(password, korisnik.password);
 
     if (!isPasswordValid) {
-      if (!req.session.loginAttempts) {
-        req.session.loginAttempts = 0;
-      }
-      req.session.loginAttempts += 1;
-
-      if (req.session.loginAttempts >= 3) {
-        req.session.blockedUntil = Date.now() + 60000;
-        return res.status(429).json({ greska: 'Previse neuspjesnih pokusaja. Pokusajte ponovo za 1 minutu.' });
-      }
-
       return res.status(401).json({ greska: 'Neispravni kredencijali.' });
     }
 
-    if (req.session.blockedUntil && Date.now() < req.session.blockedUntil) {
-      return res.status(429).json({ greska: 'Previse neuspjesnih pokusaja. Pokusajte ponovo za 1 minutu.' });
-    }
-
-    req.session.username = korisnik.username;
-    req.session.userId = korisnik.id;
-    req.session.admin = korisnik.admin;
-    req.session.loginAttempts = 0;
-
+    await regenerateSession(req);
+    postaviKorisnikaUSesiju(req, korisnik);
     res.status(200).json({ poruka: 'Uspješna prijava' });
   } catch (error) {
     console.error('Login error:', error);
@@ -96,6 +100,7 @@ exports.logout = (req, res) => {
       console.error('Logout error:', err);
       return res.status(500).json({ greska: 'Internal Server Error' });
     }
+    res.clearCookie('nekretnine.sid');
     res.status(200).json({ poruka: 'Uspješno ste se odjavili' });
   });
 };

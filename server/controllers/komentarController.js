@@ -1,4 +1,5 @@
 const { Komentar, Korisnik, Nekretnina } = require('../models');
+const validacija = require('../utils/validation');
 
 const KORISNIK_ATRIBUTI = ['id', 'ime', 'prezime', 'username'];
 
@@ -22,13 +23,10 @@ exports.getKomentariZaNekretninu = async (req, res) => {
 };
 
 exports.createKomentar = async (req, res) => {
-  const { tekst } = req.body;
   try {
+    const tekst = validacija.tekst(req.body.tekst, 'Komentar');
     if (!req.session.userId) {
       return res.status(401).json({ greska: 'Neautorizovan pristup. Molimo prijavite se.' });
-    }
-    if (!tekst || !tekst.trim()) {
-      return res.status(400).json({ greska: 'Komentar ne smije biti prazan.' });
     }
 
     const nekretnina = await Nekretnina.findByPk(req.params.id);
@@ -40,7 +38,7 @@ exports.createKomentar = async (req, res) => {
     }
 
     const komentar = await Komentar.create({
-      tekst: tekst.trim(),
+      tekst,
       NekretninaId: req.params.id,
       KorisnikId: req.session.userId,
     });
@@ -51,19 +49,15 @@ exports.createKomentar = async (req, res) => {
 
     res.status(201).json(kreiraniKomentar);
   } catch (error) {
-    console.error('Greška pri kreiranju komentara:', error);
-    res.status(500).json({ greska: 'Internal Server Error' });
+    validacija.odgovoriNaGresku(error, res, 'Greška pri kreiranju komentara:');
   }
 };
 
 exports.createOdgovor = async (req, res) => {
-  const { tekst } = req.body;
   try {
+    const tekst = validacija.tekst(req.body.tekst, 'Odgovor');
     if (!req.session.userId) {
       return res.status(401).json({ greska: 'Neautorizovan pristup. Molimo prijavite se.' });
-    }
-    if (!tekst || !tekst.trim()) {
-      return res.status(400).json({ greska: 'Odgovor ne smije biti prazan.' });
     }
 
     const nekretnina = await Nekretnina.findByPk(req.params.id);
@@ -78,9 +72,12 @@ exports.createOdgovor = async (req, res) => {
     if (!roditeljKomentar) {
       return res.status(404).json({ greska: 'Komentar na koji se odgovara ne postoji.' });
     }
+    if (String(roditeljKomentar.NekretninaId) !== String(req.params.id)) {
+      return res.status(400).json({ greska: 'Komentar ne pripada navedenoj nekretnini.' });
+    }
 
     const odgovor = await Komentar.create({
-      tekst: tekst.trim(),
+      tekst,
       NekretninaId: req.params.id,
       KorisnikId: req.session.userId,
       idVezanogKomentara: roditeljKomentar.id,
@@ -92,8 +89,7 @@ exports.createOdgovor = async (req, res) => {
 
     res.status(201).json(kreiraniOdgovor);
   } catch (error) {
-    console.error('Greška pri kreiranju odgovora:', error);
-    res.status(500).json({ greska: 'Internal Server Error' });
+    validacija.odgovoriNaGresku(error, res, 'Greška pri kreiranju odgovora:');
   }
 };
 

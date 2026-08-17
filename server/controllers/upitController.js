@@ -1,11 +1,13 @@
 const { Korisnik, Nekretnina, Upit } = require('../models');
+const validacija = require('../utils/validation');
 
 exports.createUpit = async (req, res) => {
   if (!req.session.username) {
     return res.status(401).json({ greska: 'Neautorizovan pristup' });
   }
-  const { nekretnina_id, tekst_upita } = req.body;
   try {
+    const nekretnina_id = validacija.pozitivanId(req.body.nekretnina_id, 'ID nekretnine');
+    const tekst_upita = validacija.tekst(req.body.tekst_upita, 'Tekst upita');
     const korisnik = await Korisnik.findOne({ where: { username: req.session.username } });
     if (!korisnik) {
       return res.status(401).json({ greska: 'Korisnik nije pronađen' });
@@ -34,8 +36,7 @@ exports.createUpit = async (req, res) => {
 
     res.status(200).json({ poruka: 'Upit je uspješno dodan', upit });
   } catch (error) {
-    console.error('Error processing query:', error);
-    res.status(500).json({ greska: 'Internal Server Error' });
+    validacija.odgovoriNaGresku(error, res, 'Error processing query:');
   }
 };
 
@@ -67,16 +68,12 @@ exports.getMojiUpiti = async (req, res) => {
 };
 
 exports.odgovoriNaUpit = async (req, res) => {
-  const { odgovor } = req.body;
   try {
+    const odgovor = validacija.tekst(req.body.odgovor, 'Odgovor');
     if (!req.session.userId) {
       return res.status(401).json({ greska: 'Neautorizovan pristup. Molimo prijavite se.' });
     }
-    if (!odgovor || !odgovor.trim()) {
-      return res.status(400).json({ greska: 'Odgovor ne smije biti prazan.' });
-    }
-
-    const upit = await Upit.findByPk(req.params.id);
+    const upit = await Upit.findByPk(validacija.pozitivanId(req.params.id));
     if (!upit) {
       return res.status(404).json({ greska: 'Upit nije pronađen.' });
     }
@@ -88,13 +85,12 @@ exports.odgovoriNaUpit = async (req, res) => {
       return res.status(403).json({ greska: 'Samo vlasnik nekretnine ili admin mogu odgovoriti na upit.' });
     }
 
-    upit.odgovor = odgovor.trim();
+    upit.odgovor = odgovor;
     await upit.save();
 
     res.status(200).json(upit);
   } catch (error) {
-    console.error('Error answering query:', error);
-    res.status(500).json({ greska: 'Internal Server Error' });
+    validacija.odgovoriNaGresku(error, res, 'Error answering query:');
   }
 };
 

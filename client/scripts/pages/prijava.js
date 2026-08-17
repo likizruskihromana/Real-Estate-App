@@ -68,7 +68,11 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     function showError(message) {
-        areaBelow.innerHTML = `<p class="error">${message}</p>`;
+        areaBelow.replaceChildren();
+        const poruka = document.createElement('p');
+        poruka.className = 'error';
+        poruka.textContent = message;
+        areaBelow.appendChild(poruka);
     }
 
     function startCountdown(seconds) {

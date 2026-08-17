@@ -1,8 +1,10 @@
 const { Nekretnina, Zahtjev } = require('../models');
+const validacija = require('../utils/validation');
 
 exports.createZahtjev = async (req, res) => {
-  const { tekst, trazeniDatum } = req.body;
   try {
+    const tekst = validacija.tekst(req.body.tekst, 'Tekst zahtjeva');
+    const trazeniDatum = req.body.trazeniDatum;
     if (!trazeniDatum || isNaN(Date.parse(trazeniDatum)) || new Date(trazeniDatum) < new Date()) {
       return res.status(400).json({ greska: 'Datum pregleda nije validan. Molimo unesite budući datum.' });
     }
@@ -24,8 +26,7 @@ exports.createZahtjev = async (req, res) => {
     });
     res.status(201).json(zahtjev);
   } catch (error) {
-    console.error('Greška prilikom kreiranja zahtjeva:', error);
-    res.status(500).json({ greska: 'Internal Server Error' });
+    validacija.odgovoriNaGresku(error, res, 'Greška prilikom kreiranja zahtjeva:');
   }
 };
 

@@ -5,8 +5,10 @@ services:
     container_name: nekretnine_mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: wt24
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change_me_for_development}
+      MYSQL_DATABASE: ${DB_NAME:-wt24}
+      MYSQL_USER: ${DB_USER:-nekretnine_app}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-change_me_for_development}
     ports:
       - "3306:3306"
     volumes:
@@ -16,7 +18,8 @@ services:
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
-      retries: 1
+      interval: 5s
+      retries: 10
 
   app:
     build: .
@@ -27,9 +30,10 @@ services:
     environment:
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_NAME: wt24
-      DB_USER: root
-      DB_PASSWORD: password
+      DB_NAME: ${DB_NAME:-wt24}
+      DB_USER: ${DB_USER:-nekretnine_app}
+      DB_PASSWORD: ${DB_PASSWORD:-change_me_for_development}
+      SESSION_SECRET: ${SESSION_SECRET:-development_only_change_me}
       NODE_ENV: development
     depends_on:
       mysql:

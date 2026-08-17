@@ -64,9 +64,9 @@ function createNekretninaCard(nekretnina) {
     div.className = 'nekretnina';
 
     div.innerHTML = `
-        <img class="slika-nekretnine" src="../resources/stan1.jpg" alt="${nekretnina.naziv}">
+        <img class="slika-nekretnine" src="../resources/stan1.jpg" alt="${Helpers.escapeHtml(nekretnina.naziv)}">
         <div class="detalji-nekretnine">
-            <h3>${nekretnina.naziv}</h3>
+            <h3>${Helpers.escapeHtml(nekretnina.naziv)}</h3>
             <p>Kvadratura: ${nekretnina.kvadratura} m²</p>
         </div>
         <div class="cijena-nekretnine">
@@ -114,11 +114,6 @@ function setupModal() {
     const overlay = document.getElementById('modal-overlay');
     const zatvoriDugme = document.getElementById('modal-zatvori');
     const forma = document.getElementById('nekretnina-forma');
-
-console.log("dodaj:", dodajDugme);
-console.log("overlay:", overlay);
-console.log("zatvori:", zatvoriDugme);
-console.log("forma:", forma);
 
 if (!dodajDugme || !overlay || !zatvoriDugme || !forma) {
     console.error("Neki element nedostaje.");

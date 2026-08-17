@@ -1,8 +1,21 @@
-const { Nekretnina, Ponuda, Korisnik } = require('../models');
+const { Op } = require('sequelize');
+const { sequelize, Nekretnina, Ponuda, Korisnik } = require('../models');
+const validacija = require('../utils/validation');
 
 exports.createPonuda = async (req, res) => {
-  const { tekst, ponudaCijene, datumPonude, idVezanePonude, odbijenaPonuda } = req.body;
   try {
+    const tekst = validacija.tekst(req.body.tekst, 'Tekst ponude');
+    const ponudaCijene = validacija.pozitivanBroj(req.body.ponudaCijene, 'Cijena ponude');
+    const datumPonude = req.body.datumPonude;
+    const idVezanePonude = req.body.idVezanePonude
+      ? validacija.pozitivanId(req.body.idVezanePonude, 'ID vezane ponude')
+      : null;
+    const odbijenaPonuda = req.body.odbijenaPonuda === undefined
+      ? false
+      : validacija.boolean(req.body.odbijenaPonuda, 'Odbijena ponuda');
+    if (!datumPonude || Number.isNaN(Date.parse(datumPonude))) {
+      return res.status(400).json({ greska: 'Datum ponude nije validan.' });
+    }
     if (!req.session.userId) {
       return res.status(401).json({ greska: 'Neautorizovan pristup. Molimo prijavite se.' });
     }
@@ -25,6 +38,9 @@ exports.createPonuda = async (req, res) => {
       const vezanaPonuda = await Ponuda.findByPk(idVezanePonude);
       if (!vezanaPonuda) {
         return res.status(400).json({ greska: 'Vezana ponuda nije pronađena' });
+      }
+      if (vezanaPonuda.NekretninaId !== nekretnina.id) {
+        return res.status(400).json({ greska: 'Vezana ponuda ne pripada ovoj nekretnini.' });
       }
 
       const isAdmin = req.session.admin;
@@ -67,8 +83,7 @@ exports.createPonuda = async (req, res) => {
     });
     res.status(201).json(ponuda);
   } catch (error) {
-    console.error('Greška prilikom kreiranja ponude:', error);
-    res.status(500).json({ greska: 'Internal Server Error' });
+    validacija.odgovoriNaGresku(error, res, 'Greška prilikom kreiranja ponude:');
   }
 };
 
@@ -97,8 +112,8 @@ exports.getMojePonude = async (req, res) => {
 };
 
 exports.updatePonuda = async (req, res) => {
-  const { odbijenaPonuda } = req.body;
   try {
+    const odbijenaPonuda = validacija.boolean(req.body.odbijenaPonuda, 'Odbijena ponuda');
     if (!req.session.userId) {
       return res.status(401).json({ greska: 'Neautorizovan pristup. Molimo prijavite se.' });
     }
@@ -121,15 +136,12 @@ exports.updatePonuda = async (req, res) => {
       return res.status(403).json({ greska: 'Možete prihvatati ili odbijati ponude samo za nekretnine koje ste vi objavili.' });
     }
 
-    if (odbijenaPonuda !== undefined) {
-      ponuda.odbijenaPonuda = odbijenaPonuda;
-    }
+    ponuda.odbijenaPonuda = odbijenaPonuda;
 
     await ponuda.save();
     res.status(200).json(ponuda);
   } catch (error) {
-    console.error('Greška prilikom ažuriranja ponude:', error);
-    res.status(500).json({ greska: 'Internal Server Error' });
+    validacija.odgovoriNaGresku(error, res, 'Greška prilikom ažuriranja ponude:');
   }
 };
 
@@ -137,50 +149,73 @@ exports.updatePonuda = async (req, res) => {
 // na istu nekretninu se automatski odbijaju, a dalje komentarisanje/upiti/
 // zahtjevi/ponude se zatvaraju (provjerava se u ostalim kontrolerima).
 exports.prihvatiPonudu = async (req, res) => {
+  let rezultat;
   try {
     if (!req.session.userId) {
       return res.status(401).json({ greska: 'Neautorizovan pristup. Molimo prijavite se.' });
     }
 
-    const ponuda = await Ponuda.findByPk(req.params.id);
-    if (!ponuda) {
-      return res.status(404).json({ greska: 'Ponuda nije pronađena.' });
-    }
+    await sequelize.transaction(async (transaction) => {
+      const ponuda = await Ponuda.findByPk(req.params.id, {
+        transaction,
+        lock: transaction.LOCK.UPDATE,
+      });
+      if (!ponuda) {
+        const error = new Error('Ponuda nije pronađena.');
+        error.status = 404;
+        throw error;
+      }
 
-    const nekretnina = await Nekretnina.findByPk(ponuda.NekretninaId);
-    if (!nekretnina) {
-      return res.status(404).json({ greska: 'Nekretnina nije pronađena.' });
-    }
+      const nekretnina = await Nekretnina.findByPk(ponuda.NekretninaId, {
+        transaction,
+        lock: transaction.LOCK.UPDATE,
+      });
+      if (!nekretnina) {
+        const error = new Error('Nekretnina nije pronađena.');
+        error.status = 404;
+        throw error;
+      }
 
-    const jeVlasnikNekretnine = nekretnina.KorisnikId === req.session.userId;
-    if (!req.session.admin && !jeVlasnikNekretnine) {
-      return res.status(403).json({ greska: 'Samo vlasnik nekretnine ili admin mogu prihvatiti ponudu.' });
-    }
+      const jeVlasnikNekretnine = nekretnina.KorisnikId === req.session.userId;
+      if (!req.session.admin && !jeVlasnikNekretnine) {
+        const error = new Error('Samo vlasnik nekretnine ili admin mogu prihvatiti ponudu.');
+        error.status = 403;
+        throw error;
+      }
+      if (nekretnina.kupljeno) {
+        const error = new Error('Nekretnina je već prodana.');
+        error.status = 400;
+        throw error;
+      }
+      if (ponuda.odbijenaPonuda) {
+        const error = new Error('Ne možete prihvatiti odbijenu ponudu.');
+        error.status = 400;
+        throw error;
+      }
 
-    if (nekretnina.kupljeno) {
-      return res.status(400).json({ greska: 'Nekretnina je već prodana.' });
-    }
-    if (ponuda.odbijenaPonuda) {
-      return res.status(400).json({ greska: 'Ne možete prihvatiti odbijenu ponudu.' });
-    }
+      ponuda.prihvacenaPonuda = true;
+      await ponuda.save({ transaction });
+      await Ponuda.update(
+        { odbijenaPonuda: true },
+        { transaction, where: { NekretninaId: nekretnina.id, id: { [Op.ne]: ponuda.id } } }
+      );
 
-    ponuda.prihvacenaPonuda = true;
-    await ponuda.save();
+      nekretnina.kupljeno = true;
+      nekretnina.datumKupovine = new Date();
+      nekretnina.prodajnaCijena = ponuda.cijenaPonude;
+      nekretnina.kupacId = ponuda.KorisnikId;
+      await nekretnina.save({ transaction });
+      rezultat = { nekretnina, ponuda };
+    });
 
-    // Sve ostale (ne-odbijene) ponude na ovu nekretninu se automatski odbijaju
-    await Ponuda.update(
-      { odbijenaPonuda: true },
-      { where: { NekretninaId: nekretnina.id, id: { [require('sequelize').Op.ne]: ponuda.id } } }
-    );
-
-    nekretnina.kupljeno = true;
-    nekretnina.datumKupovine = new Date();
-    nekretnina.prodajnaCijena = ponuda.cijenaPonude;
-    nekretnina.kupacId = ponuda.KorisnikId;
-    await nekretnina.save();
-
-    res.status(200).json({ poruka: 'Ponuda je prihvaćena, nekretnina je označena kao prodana.', nekretnina, ponuda });
+    res.status(200).json({
+      poruka: 'Ponuda je prihvaćena, nekretnina je označena kao prodana.',
+      ...rezultat,
+    });
   } catch (error) {
+    if (error.status) {
+      return res.status(error.status).json({ greska: error.message });
+    }
     console.error('Greška prilikom prihvatanja ponude:', error);
     res.status(500).json({ greska: 'Internal Server Error' });
   }
