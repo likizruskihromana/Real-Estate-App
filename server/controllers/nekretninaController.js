@@ -1,7 +1,17 @@
-const { sequelize, Nekretnina, Upit, Zahtjev, Ponuda, Korisnik, Komentar } = require('../models');
+const fs = require('fs/promises');
+const path = require('path');
+const { sequelize, Nekretnina, Upit, Zahtjev, Ponuda, Korisnik, Komentar, SlikaNekretnine } = require('../models');
+const { uploadsDir } = require('../middleware/upload');
 
 const DOZVOLJENI_TIPOVI = ['Stan', 'Kuća', 'Poslovni prostor'];
 const pagination = require('../utils/pagination');
+
+const slikeInclude = () => ({
+  model: SlikaNekretnine,
+  as: 'Slike',
+  separate: true,
+  order: [['glavna', 'DESC'], ['redoslijed', 'ASC'], ['id', 'ASC']],
+});
 
 function validirajPodatke(body, { zahtijevajSvaPolja }) {
   const greske = [];
@@ -40,6 +50,7 @@ exports.getAll = async (req, res) => {
     const stranica = pagination.parametri(req.query);
     const opcije = {
       where: { kupljeno: false },
+      include: [slikeInclude()],
       order: [['datum_objave', 'DESC']],
       ...(stranica.enabled ? { limit: stranica.limit, offset: stranica.offset } : {}),
     };
@@ -60,6 +71,7 @@ exports.getArhiva = async (req, res) => {
       include: [
         { model: Korisnik, attributes: ['id', 'username'] },
         { model: Korisnik, as: 'Kupac', attributes: ['id', 'username'] },
+        slikeInclude(),
       ],
       order: [['datumKupovine', 'DESC']],
       ...(stranica.enabled ? { limit: stranica.limit, offset: stranica.offset, distinct: true } : {}),
@@ -77,6 +89,7 @@ exports.getMoje = async (req, res) => {
   try {
     const nekretnine = await Nekretnina.findAll({
       where: { KorisnikId: req.session.userId },
+      include: [slikeInclude()],
       order: [['id', 'DESC']],
     });
     res.status(200).json(nekretnine);
@@ -159,6 +172,7 @@ exports.remove = async (req, res) => {
       return res.status(403).json({ greska: 'Nemate prava da obrišete ovu nekretninu.' });
     }
 
+    const slike = await SlikaNekretnine.findAll({ where: { NekretninaId: nekretnina.id } });
     await sequelize.transaction(async (transaction) => {
       // Prvo prekini self-reference, zatim ukloni sve komentare u istoj transakciji.
       await Komentar.update(
@@ -173,6 +187,13 @@ exports.remove = async (req, res) => {
       ]);
       await nekretnina.destroy({ transaction });
     });
+    await Promise.all(slike.map(async (slika) => {
+      const punaPutanja = path.resolve(uploadsDir, slika.filename);
+      if (!punaPutanja.startsWith(path.resolve(uploadsDir) + path.sep)) return;
+      await fs.unlink(punaPutanja).catch((error) => {
+        if (error.code !== 'ENOENT') console.error('Brisanje fotografije nije uspjelo:', error);
+      });
+    }));
     res.status(200).json({ poruka: 'Nekretnina je uspješno obrisana.' });
   } catch (error) {
     console.error('Error deleting property:', error);
@@ -186,6 +207,7 @@ exports.getById = async (req, res) => {
       include: [
         { model: Upit, as: 'Upiti', limit: 3, order: [['id', 'DESC']], separate: true },
         { model: Zahtjev, as: 'Zahtjevi' },
+        slikeInclude(),
       ],
     });
 
@@ -206,6 +228,7 @@ exports.getTop5 = async (req, res) => {
   try {
     const nekretnine = await Nekretnina.findAll({
       where: { lokacija },
+      include: [slikeInclude()],
       order: [['datum_objave', 'DESC']],
       limit: 5,
     });

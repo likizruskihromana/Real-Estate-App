@@ -19,6 +19,7 @@ const Upit = require('./Upit')(sequelize);
 const Zahtjev = require('./Zahtjev')(sequelize);
 const Ponuda = require('./Ponuda')(sequelize);
 const Komentar = require('./Komentar')(sequelize); // <-- DODANO
+const SlikaNekretnine = require('./SlikaNekretnine')(sequelize);
 
 // Veze
 Korisnik.hasMany(Nekretnina);
@@ -54,6 +55,9 @@ Komentar.belongsTo(Komentar, { as: 'GlavniKomentar', foreignKey: 'idVezanogKomen
 // Kupac nekretnine (postavlja se kad se prihvati ponuda)
 Nekretnina.belongsTo(Korisnik, { as: 'Kupac', foreignKey: 'kupacId' });
 
+Nekretnina.hasMany(SlikaNekretnine, { as: 'Slike', foreignKey: 'NekretninaId', onDelete: 'CASCADE' });
+SlikaNekretnine.belongsTo(Nekretnina, { foreignKey: 'NekretninaId' });
+
 Nekretnina.prototype.getInteresovanja = async function () {
   const [upiti, zahtjevi, ponude] = await Promise.all([
     this.getUpiti(),
@@ -63,4 +67,4 @@ Nekretnina.prototype.getInteresovanja = async function () {
   return [...upiti, ...zahtjevi, ...ponude];
 };
 
-module.exports = { sequelize, Korisnik, Nekretnina, Upit, Zahtjev, Ponuda, Komentar };
+module.exports = { sequelize, Korisnik, Nekretnina, Upit, Zahtjev, Ponuda, Komentar, SlikaNekretnine };

@@ -41,6 +41,7 @@ services:
     volumes:
       - ./server:/app/server
       - ./client:/app/client
+      - ./uploads:/app/uploads
     networks:
       - nekretnine_network
     command: node server/index.js

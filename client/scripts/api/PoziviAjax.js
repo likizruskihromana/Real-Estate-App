@@ -32,6 +32,19 @@ const PoziviAjax = (() => {
         
         xhr.send(data ? JSON.stringify(data) : null);
     }
+    function ajaxFormRequest(method, url, formData, callback) {
+        const xhr = new XMLHttpRequest();
+        xhr.open(method, url, true);
+        xhr.setRequestHeader('X-CSRF-Token', getCookie('nekretnine.csrf'));
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState !== 4) return;
+            let odgovor = null;
+            try { odgovor = xhr.responseText ? JSON.parse(xhr.responseText) : null; } catch (_error) {}
+            if (xhr.status >= 200 && xhr.status < 300) callback(null, odgovor);
+            else callback({ status: xhr.status, statusText: odgovor?.greska || xhr.statusText }, null);
+        };
+        xhr.send(formData);
+    }
     // AUTH
     function impl_postLogin(username, password, fnCallback) {
         ajaxRequest('POST', `${API_BASE_URL}/api/auth/login`, 
@@ -185,6 +198,23 @@ const PoziviAjax = (() => {
                     fnCallback(e, null);
                 }
             }
+        });
+    }
+    function impl_uploadSlikaNekretnine(nekretnina_id, file, fnCallback) {
+        const formData = new FormData();
+        formData.append('slika', file);
+        ajaxFormRequest('POST', `${API_BASE_URL}/api/nekretnine/${nekretnina_id}/slike`, formData, fnCallback);
+    }
+    function impl_postaviGlavnuSliku(nekretnina_id, slika_id, fnCallback) {
+        ajaxRequest('PATCH', `${API_BASE_URL}/api/nekretnine/${nekretnina_id}/slike/${slika_id}/glavna`, {}, (error, data) => {
+            if (error) return fnCallback(error, null);
+            try { fnCallback(null, JSON.parse(data)); } catch (e) { fnCallback(e, null); }
+        });
+    }
+    function impl_obrisiSlikuNekretnine(nekretnina_id, slika_id, fnCallback) {
+        ajaxRequest('DELETE', `${API_BASE_URL}/api/nekretnine/${nekretnina_id}/slike/${slika_id}`, null, (error, data) => {
+            if (error) return fnCallback(error, null);
+            try { fnCallback(null, JSON.parse(data)); } catch (e) { fnCallback(e, null); }
         });
     }
     // ADMIN
@@ -490,6 +520,9 @@ const PoziviAjax = (() => {
         getMojeNekretnine: impl_getMojeNekretnine,
         putNekretnina: impl_putNekretnina,
         deleteNekretnina: impl_deleteNekretnina,
+        uploadSlikaNekretnine: impl_uploadSlikaNekretnine,
+        postaviGlavnuSliku: impl_postaviGlavnuSliku,
+        obrisiSlikuNekretnine: impl_obrisiSlikuNekretnine,
         getMojiUpiti: impl_getMojiUpiti,
         getNextUpiti: impl_getNextUpiti,
         getNekretninaInteresovanja: impl_getNekretninaInteresovanja,

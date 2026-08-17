@@ -2,8 +2,9 @@
 .env.*
 !.env.example
 node_modules/
+uploads/nekretnine/*
+!uploads/nekretnine/.gitkeep
 coverage/
 logs/
 *.log
 .DS_Store
-

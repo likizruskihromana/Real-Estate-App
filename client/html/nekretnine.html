@@ -43,6 +43,8 @@
                 <div class="form-row"><div class="form-group"><label for="f-lokacija">Lokacija</label><input type="text" id="f-lokacija" required></div><div class="form-group"><label for="f-grijanje">Tip grijanja</label><input type="text" id="f-grijanje" placeholder="npr. centralno"></div></div>
                 <div class="form-group"><label for="f-godina">Godina izgradnje</label><input type="number" id="f-godina" min="1800"></div>
                 <div class="form-group"><label for="f-opis">Opis</label><textarea id="f-opis" rows="4"></textarea></div>
+                <div class="form-group photo-upload-field"><label for="f-fotografije">Fotografije</label><input type="file" id="f-fotografije" accept="image/jpeg,image/png,image/webp" multiple><small>JPG, PNG ili WebP, do 5 MB po slici. Najviše 8 fotografija.</small></div>
+                <div id="fotografije-postojeci" class="photo-manager" hidden><p>Objavljene fotografije</p><div id="photo-manager-grid" class="photo-manager__grid"></div></div>
                 <button type="submit" id="nekretnina-sacuvaj-dugme" class="button button--dark button--full">Sačuvaj nekretninu</button>
             </form>
         </div>

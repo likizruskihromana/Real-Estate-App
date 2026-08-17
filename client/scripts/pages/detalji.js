@@ -32,6 +32,7 @@ async function loadNekretninaDetalji(id) {
         }
 
         nekretninaKupljena = !!nekretnina.kupljeno;
+        displayGalerija(nekretnina);
         displayOsnovniPodaci(nekretnina);
         displayDetalji(nekretnina);
         loadTop5(nekretnina.lokacija);
@@ -40,6 +41,31 @@ async function loadNekretninaDetalji(id) {
 
     loadInteresovanja(id);
     loadKomentari(id);
+}
+
+function displayGalerija(nekretnina) {
+    const slike = nekretnina.Slike || [];
+    const glavna = slike.find(slika => slika.glavna) || slike[0];
+    const mainImage = document.getElementById('gallery-main-image');
+    const thumbnails = document.getElementById('gallery-thumbnails');
+    const count = document.getElementById('gallery-count');
+    mainImage.src = glavna ? glavna.url : '../resources/stan1.jpg';
+    mainImage.alt = nekretnina.naziv;
+    count.textContent = slike.length ? `${slike.length} ${slike.length === 1 ? 'fotografija' : 'fotografija'}` : 'Ilustrativna fotografija';
+    thumbnails.hidden = slike.length < 2;
+    thumbnails.innerHTML = slike.map((slika, index) => `
+        <button type="button" class="gallery-thumbnail ${slika.id === glavna?.id ? 'is-active' : ''}" data-index="${index}" aria-label="Prikaži fotografiju ${index + 1}">
+            <img src="${Helpers.escapeHtml(slika.url)}" alt="">
+        </button>
+    `).join('');
+    thumbnails.querySelectorAll('.gallery-thumbnail').forEach(button => {
+        button.addEventListener('click', () => {
+            const slika = slike[Number(button.dataset.index)];
+            mainImage.src = slika.url;
+            thumbnails.querySelectorAll('.gallery-thumbnail').forEach(item => item.classList.remove('is-active'));
+            button.classList.add('is-active');
+        });
+    });
 }
 
 function displayOsnovniPodaci(nekretnina) {
@@ -53,7 +79,7 @@ function displayOsnovniPodaci(nekretnina) {
         ${nekretnina.kupljeno ? `<p class="napomena-prodano">Prodano ${Helpers.formatDate(nekretnina.datumKupovine)} za ${Helpers.formatPrice(nekretnina.prodajnaCijena)}.</p>` : ''}
     `;
 
-    document.title = `${e(nekretnina.naziv)} — Domus`;
+    document.title = `${nekretnina.naziv} — Domus`;
 }
 
 function displayDetalji(nekretnina) {

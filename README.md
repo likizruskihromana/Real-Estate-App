@@ -61,7 +61,8 @@ Za lokalni razvoj potreban je Node.js 22 ili noviji podržani LTS runtime.
 
 ```
 ├── client/     # Frontend (HTML, CSS, JS)
-└── server/     # Backend (Express, Sequelize, MySQL)
+├── server/     # Backend (Express, Sequelize, MySQL)
+└── uploads/    # Trajne fotografije nekretnina (sadržaj se ne commit u Git)
 ```
 
 ## 🔐 Default Credentials
@@ -85,12 +86,19 @@ automatski; produkcijska baza treba sadržavati tu tabelu prije pokretanja.
 - `POST /api/auth/logout` - Odjava
 - `GET /api/nekretnine` - Sve nekretnine
 - `GET /api/nekretnine/:id` - Detalji nekretnine
+- `POST /api/nekretnine/:id/slike` - Upload fotografije (vlasnik/admin)
+- `PATCH /api/nekretnine/:id/slike/:slikaId/glavna` - Postavi glavnu fotografiju
+- `DELETE /api/nekretnine/:id/slike/:slikaId` - Obriši fotografiju
 - `POST /api/upiti` - Dodaj upit
 - `GET /api/upiti/moji` - Moji upiti
 
 Liste podržavaju opt-in paginaciju pomoću `?page=1&limit=20` (maksimalni limit
 je 100). Paginiran odgovor ima `items` i `pagination`; bez parametara se zadržava
 stari format odgovora radi kompatibilnosti.
+
+Fotografije su ograničene na JPG, PNG i WebP, maksimalno 5 MB po datoteci i
+8 fotografija po nekretnini. Docker Compose mapira lokalni `uploads/` direktorij
+u kontejner kako bi fotografije preživjele ponovno kreiranje aplikacije.
 
 ## ✅ Provjere
 

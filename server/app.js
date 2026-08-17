@@ -35,6 +35,10 @@ function createApp({ sessionStore, serveStatic = true } = {}) {
 
   app.use(csrfProtection);
   if (serveStatic) app.use(express.static(path.join(__dirname, '../client')));
+  if (serveStatic) app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
+    fallthrough: false,
+    maxAge: config.server.nodeEnv === 'production' ? '7d' : 0,
+  }));
   app.use(express.json({ limit: '100kb' }));
   app.use(express.urlencoded({ extended: true, limit: '100kb' }));
   app.use('/api', routes);
@@ -57,4 +61,3 @@ function createApp({ sessionStore, serveStatic = true } = {}) {
 }
 
 module.exports = { createApp };
-
