@@ -18,6 +18,9 @@ npm run dev
 # Kreiraj ili ažuriraj šemu kontrolisanim migracijama
 npm run migrate
 
+# Ako MySQL radi kroz Docker i DB_HOST je "mysql"
+npm run migrate:docker
+
 # Poništi posljednju migraciju (destruktivno; prvo napraviti backup)
 npm run migrate:undo
 ```
@@ -25,6 +28,10 @@ npm run migrate:undo
 Server pri pokretanju ne kreira niti resetuje poslovnu šemu baze. Za novu bazu
 prvo pokrenite `npm run migrate`, a zatim po želji `npm run seed`. Seeder će se
 zaustaviti ako podaci već postoje.
+
+Naziv hosta `mysql` postoji samo unutar Compose mreže. Za komandu pokrenutu iz
+lokalnog PowerShella koristite `DB_HOST=localhost`; kada je baza u Dockeru,
+najjednostavnije je koristiti `npm run migrate:docker`.
 
 ### Sa Dockerom
 ```bash

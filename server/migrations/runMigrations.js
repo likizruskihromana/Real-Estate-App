@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../models');
+const config = require('../config/env');
 const initialSchema = require('./001-initial-schema');
 
 const migrations = [initialSchema];
@@ -49,6 +50,12 @@ async function undo() {
 const akcija = process.argv[2] === '--undo' ? undo : migrate;
 akcija()
   .catch((error) => {
+    if (error.original?.code === 'ENOTFOUND' && config.database.host === 'mysql') {
+      console.error(
+        'Host "mysql" je dostupan samo unutar Docker mreže. ' +
+        'Pokrenite "npm run migrate:docker" ili za lokalno izvršavanje postavite DB_HOST=localhost.'
+      );
+    }
     console.error('Migracija nije uspjela:', error);
     process.exitCode = 1;
   })

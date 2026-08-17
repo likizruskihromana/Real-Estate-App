@@ -12,6 +12,7 @@
     "seed": "node server/seeders/runSeed.js",
     "migrate": "node server/migrations/runMigrations.js",
     "migrate:undo": "node server/migrations/runMigrations.js --undo",
+    "migrate:docker": "docker compose run --rm app npm run migrate",
     "docker:up": "docker-compose up --build",
     "docker:down": "docker-compose down",
     "docker:clean": "docker-compose down -v"
