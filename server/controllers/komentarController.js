@@ -1,5 +1,6 @@
 const { Komentar, Korisnik, Nekretnina } = require('../models');
 const validacija = require('../utils/validation');
+const pagination = require('../utils/pagination');
 
 const KORISNIK_ATRIBUTI = ['id', 'ime', 'prezime', 'username'];
 
@@ -120,14 +121,18 @@ async function obrisiKomentarSaOdgovorima(id) {
 
 exports.getSviKomentari = async (req, res) => {
   try {
-    const komentari = await Komentar.findAll({
+    const stranica = pagination.parametri(req.query);
+    const opcije = {
       include: [
         { model: Korisnik, attributes: KORISNIK_ATRIBUTI },
         { model: Nekretnina, attributes: ['id', 'naziv'] },
       ],
       order: [['createdAt', 'DESC']],
-    });
-    res.status(200).json(komentari);
+      ...(stranica.enabled ? { limit: stranica.limit, offset: stranica.offset, distinct: true } : {}),
+    };
+    if (!stranica.enabled) return res.status(200).json(await Komentar.findAll(opcije));
+    const { rows, count } = await Komentar.findAndCountAll(opcije);
+    res.status(200).json(pagination.odgovor(rows, count, stranica));
   } catch (error) {
     console.error('Greška pri dohvatanju svih komentara:', error);
     res.status(500).json({ greska: 'Internal Server Error' });

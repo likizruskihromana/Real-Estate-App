@@ -1,6 +1,7 @@
 const { sequelize, Nekretnina, Upit, Zahtjev, Ponuda, Korisnik, Komentar } = require('../models');
 
 const DOZVOLJENI_TIPOVI = ['Stan', 'Kuća', 'Poslovni prostor'];
+const pagination = require('../utils/pagination');
 
 function validirajPodatke(body, { zahtijevajSvaPolja }) {
   const greske = [];
@@ -36,8 +37,15 @@ function validirajPodatke(body, { zahtijevajSvaPolja }) {
 
 exports.getAll = async (req, res) => {
   try {
-    const nekretnine = await Nekretnina.findAll({ where: { kupljeno: false } });
-    res.status(200).json(nekretnine);
+    const stranica = pagination.parametri(req.query);
+    const opcije = {
+      where: { kupljeno: false },
+      order: [['datum_objave', 'DESC']],
+      ...(stranica.enabled ? { limit: stranica.limit, offset: stranica.offset } : {}),
+    };
+    if (!stranica.enabled) return res.status(200).json(await Nekretnina.findAll(opcije));
+    const { rows, count } = await Nekretnina.findAndCountAll(opcije);
+    res.status(200).json(pagination.odgovor(rows, count, stranica));
   } catch (error) {
     console.error('Error fetching properties:', error);
     res.status(500).json({ greska: 'Internal Server Error' });
@@ -46,15 +54,19 @@ exports.getAll = async (req, res) => {
 
 exports.getArhiva = async (req, res) => {
   try {
-    const nekretnine = await Nekretnina.findAll({
+    const stranica = pagination.parametri(req.query);
+    const opcije = {
       where: { kupljeno: true },
       include: [
         { model: Korisnik, attributes: ['id', 'username'] },
         { model: Korisnik, as: 'Kupac', attributes: ['id', 'username'] },
       ],
       order: [['datumKupovine', 'DESC']],
-    });
-    res.status(200).json(nekretnine);
+      ...(stranica.enabled ? { limit: stranica.limit, offset: stranica.offset, distinct: true } : {}),
+    };
+    if (!stranica.enabled) return res.status(200).json(await Nekretnina.findAll(opcije));
+    const { rows, count } = await Nekretnina.findAndCountAll(opcije);
+    res.status(200).json(pagination.odgovor(rows, count, stranica));
   } catch (error) {
     console.error('Error fetching archive:', error);
     res.status(500).json({ greska: 'Internal Server Error' });

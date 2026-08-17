@@ -4,6 +4,8 @@ const { requireAuth, requireAdmin } = require('../server/middleware/auth');
 const { loginRateLimit } = require('../server/middleware/loginRateLimit');
 const { csrfProtection } = require('../server/middleware/csrf');
 const validacija = require('../server/utils/validation');
+const { apiNotFound, errorHandler } = require('../server/middleware/errors');
+const pagination = require('../server/utils/pagination');
 
 function responseMock() {
   return {
@@ -58,6 +60,35 @@ test('validacija odbija neispravne ID i numeričke vrijednosti', () => {
   assert.throws(() => validacija.pozitivanId('../1'), /pozitivan cijeli broj/);
   assert.throws(() => validacija.pozitivanBroj('NaN', 'Cijena'), /pozitivan broj/);
   assert.equal(validacija.pozitivanId('12'), 12);
+});
+
+test('nepoznata API ruta vraća strukturisani 404 odgovor', () => {
+  const res = responseMock();
+  apiNotFound({ requestId: 'req-404' }, res);
+  assert.equal(res.statusCode, 404);
+  assert.equal(res.body.requestId, 'req-404');
+});
+
+test('centralni handler pretvara neispravan JSON u 400', () => {
+  const res = responseMock();
+  const error = new SyntaxError('Unexpected token');
+  error.status = 400;
+  error.body = '{';
+  errorHandler(error, { requestId: 'req-json' }, res, () => {});
+  assert.equal(res.statusCode, 400);
+  assert.equal(res.body.requestId, 'req-json');
+});
+
+test('paginacija ograničava limit i računa metapodatke', () => {
+  const parametri = pagination.parametri({ page: '2', limit: '500' });
+  assert.deepEqual(parametri, { enabled: true, page: 2, limit: 100, offset: 100 });
+  const body = pagination.odgovor([{ id: 1 }], 205, parametri);
+  assert.equal(body.pagination.totalPages, 3);
+  assert.equal(body.pagination.totalItems, 205);
+});
+
+test('paginacija ostaje isključena za stare API pozive', () => {
+  assert.deepEqual(pagination.parametri({}), { enabled: false });
 });
 
 test('requireAdmin odbija običnog prijavljenog korisnika', () => {

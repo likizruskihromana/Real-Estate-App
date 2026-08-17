@@ -5,9 +5,13 @@
   "main": "server/index.js",
   "scripts": {
     "test": "node --test",
+    "test:unit": "node --test test/securityMiddleware.test.js",
+    "test:integration": "node --test test/api.integration.test.js",
     "start": "node server/index.js",
     "dev": "nodemon server/index.js",
     "seed": "node server/seeders/runSeed.js",
+    "migrate": "node server/migrations/runMigrations.js",
+    "migrate:undo": "node server/migrations/runMigrations.js --undo",
     "docker:up": "docker-compose up --build",
     "docker:down": "docker-compose down",
     "docker:clean": "docker-compose down -v"

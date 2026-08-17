@@ -1,6 +1,7 @@
 const { Op } = require('sequelize');
 const { sequelize, Nekretnina, Ponuda, Korisnik } = require('../models');
 const validacija = require('../utils/validation');
+const pagination = require('../utils/pagination');
 
 exports.createPonuda = async (req, res) => {
   try {
@@ -99,12 +100,16 @@ exports.getAll = async (req, res) => {
 
 exports.getMojePonude = async (req, res) => {
   try {
-    const ponude = await Ponuda.findAll({
+    const stranica = pagination.parametri(req.query);
+    const opcije = {
       where: { KorisnikId: req.session.userId },
       include: [{ model: Nekretnina, attributes: ['id', 'naziv', 'kupljeno'] }],
       order: [['id', 'DESC']],
-    });
-    res.status(200).json(ponude);
+      ...(stranica.enabled ? { limit: stranica.limit, offset: stranica.offset, distinct: true } : {}),
+    };
+    if (!stranica.enabled) return res.status(200).json(await Ponuda.findAll(opcije));
+    const { rows, count } = await Ponuda.findAndCountAll(opcije);
+    res.status(200).json(pagination.odgovor(rows, count, stranica));
   } catch (error) {
     console.error('Error fetching own offers:', error);
     res.status(500).json({ greska: 'Internal Server Error' });

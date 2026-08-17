@@ -1,6 +1,7 @@
 const { sequelize, Korisnik, Nekretnina, Zahtjev, Ponuda, Komentar } = require('../models');
 const komentarController = require('./komentarController');
 const validacija = require('../utils/validation');
+const pagination = require('../utils/pagination');
 
 exports.getDashboard = async (req, res) => {
   try {
@@ -32,14 +33,18 @@ exports.deleteKomentar = komentarController.deleteKomentar;
 
 exports.getPonude = async (req, res) => {
   try {
-    const ponude = await Ponuda.findAll({
+    const stranica = pagination.parametri(req.query);
+    const opcije = {
       include: [
         { model: Korisnik, attributes: ['id', 'username'] },
         { model: Nekretnina, attributes: ['id', 'naziv', 'kupljeno'] },
       ],
       order: [['id', 'DESC']],
-    });
-    res.status(200).json(ponude);
+      ...(stranica.enabled ? { limit: stranica.limit, offset: stranica.offset, distinct: true } : {}),
+    };
+    if (!stranica.enabled) return res.status(200).json(await Ponuda.findAll(opcije));
+    const { rows, count } = await Ponuda.findAndCountAll(opcije);
+    res.status(200).json(pagination.odgovor(rows, count, stranica));
   } catch (error) {
     console.error('Error fetching offers for admin:', error);
     res.status(500).json({ greska: 'Internal Server Error' });
@@ -48,11 +53,15 @@ exports.getPonude = async (req, res) => {
 
 exports.getKorisnici = async (req, res) => {
   try {
-    const korisnici = await Korisnik.findAll({
+    const stranica = pagination.parametri(req.query);
+    const opcije = {
       attributes: ['id', 'ime', 'prezime', 'username', 'admin'],
       order: [['id', 'ASC']],
-    });
-    res.status(200).json(korisnici);
+      ...(stranica.enabled ? { limit: stranica.limit, offset: stranica.offset } : {}),
+    };
+    if (!stranica.enabled) return res.status(200).json(await Korisnik.findAll(opcije));
+    const { rows, count } = await Korisnik.findAndCountAll(opcije);
+    res.status(200).json(pagination.odgovor(rows, count, stranica));
   } catch (error) {
     console.error('Error fetching users:', error);
     res.status(500).json({ greska: 'Internal Server Error' });
@@ -145,11 +154,15 @@ exports.deleteKorisnik = async (req, res) => {
 
 exports.getNekretnine = async (req, res) => {
   try {
-    const nekretnine = await Nekretnina.findAll({
+    const stranica = pagination.parametri(req.query);
+    const opcije = {
       include: [{ model: Korisnik, attributes: ['id', 'username'] }],
       order: [['id', 'DESC']],
-    });
-    res.status(200).json(nekretnine);
+      ...(stranica.enabled ? { limit: stranica.limit, offset: stranica.offset, distinct: true } : {}),
+    };
+    if (!stranica.enabled) return res.status(200).json(await Nekretnina.findAll(opcije));
+    const { rows, count } = await Nekretnina.findAndCountAll(opcije);
+    res.status(200).json(pagination.odgovor(rows, count, stranica));
   } catch (error) {
     console.error('Error fetching properties for admin:', error);
     res.status(500).json({ greska: 'Internal Server Error' });
@@ -158,14 +171,18 @@ exports.getNekretnine = async (req, res) => {
 
 exports.getZahtjevi = async (req, res) => {
   try {
-    const zahtjevi = await Zahtjev.findAll({
+    const stranica = pagination.parametri(req.query);
+    const opcije = {
       include: [
         { model: Korisnik, attributes: ['id', 'username'] },
         { model: Nekretnina, attributes: ['id', 'naziv'] },
       ],
       order: [['id', 'DESC']],
-    });
-    res.status(200).json(zahtjevi);
+      ...(stranica.enabled ? { limit: stranica.limit, offset: stranica.offset, distinct: true } : {}),
+    };
+    if (!stranica.enabled) return res.status(200).json(await Zahtjev.findAll(opcije));
+    const { rows, count } = await Zahtjev.findAndCountAll(opcije);
+    res.status(200).json(pagination.odgovor(rows, count, stranica));
   } catch (error) {
     console.error('Error fetching requests for admin:', error);
     res.status(500).json({ greska: 'Internal Server Error' });

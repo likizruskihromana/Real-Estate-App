@@ -14,10 +14,17 @@ npm start
 
 # Development mod sa auto-restartom
 npm run dev
+
+# Kreiraj ili ažuriraj šemu kontrolisanim migracijama
+npm run migrate
+
+# Poništi posljednju migraciju (destruktivno; prvo napraviti backup)
+npm run migrate:undo
 ```
 
-Server pri pokretanju ne kreira niti resetuje bazu. Za praznu razvojnu bazu
-pokrenite `npm run seed` eksplicitno; naredba će se zaustaviti ako podaci već postoje.
+Server pri pokretanju ne kreira niti resetuje poslovnu šemu baze. Za novu bazu
+prvo pokrenite `npm run migrate`, a zatim po želji `npm run seed`. Seeder će se
+zaustaviti ako podaci već postoje.
 
 ### Sa Dockerom
 ```bash
@@ -73,6 +80,19 @@ automatski; produkcijska baza treba sadržavati tu tabelu prije pokretanja.
 - `GET /api/nekretnine/:id` - Detalji nekretnine
 - `POST /api/upiti` - Dodaj upit
 - `GET /api/upiti/moji` - Moji upiti
+
+Liste podržavaju opt-in paginaciju pomoću `?page=1&limit=20` (maksimalni limit
+je 100). Paginiran odgovor ima `items` i `pagination`; bez parametara se zadržava
+stari format odgovora radi kompatibilnosti.
+
+## ✅ Provjere
+
+```bash
+npm test
+npm run test:unit
+npm run test:integration
+npm audit --omit=dev
+```
 
 ## 📄 License
 
