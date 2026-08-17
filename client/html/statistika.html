@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Statistika</title>
+    <title>Analitika — Domus</title>
+    <link rel="stylesheet" href="../style/site.css">
     <link rel="stylesheet" href="../style/statistika.css">
+    <link rel="stylesheet" href="../style/workspace.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <iframe src="/meni.html"></iframe>
-
-    <div class="container">
-        <h1>Statistika nekretnina</h1>
+    <header id="site-header"></header>
+    <main class="workspace-page"><div class="container">
+        <div class="workspace-heading"><p class="eyebrow">Pregled tržišta</p><h1>Analitika nekretnina</h1><p>Uporedite strukturu ponude, cijene i karakteristike dostupnih oglasa.</p></div>
 
         <!-- Sažetak kartice -->
         <div class="stats-kartice" id="stats-kartice"></div>
@@ -69,10 +70,11 @@
             <button id="iscrtaj-histogram" class="btn-primary-stat">Iscrtaj histogram</button>
             <div id="histogram-charts"></div>
         </section>
-    </div>
+    </div></main>
 
     <script src="../scripts/utils/helpers.js"></script>
     <script src="../scripts/api/PoziviAjax.js"></script>
+    <script src="../scripts/components/siteHeader.js"></script>
     <script src="../scripts/modules/StatistikaNekretnina.js"></script>
     <script src="../scripts/pages/statistika.js"></script>
 </body>

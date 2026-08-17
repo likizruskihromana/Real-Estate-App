@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registracija</title>
+    <meta name="description" content="Kreirajte besplatan Domus profil.">
+    <title>Registracija — Domus</title>
+    <link rel="stylesheet" href="../style/site.css">
     <link rel="stylesheet" href="../style/prijava.css">
 </head>
 <body>
-    <iframe src="/meni.html"></iframe>
-
+    <header id="site-header"></header><main class="auth-page">
+    <div class="auth-intro"><a class="brand brand--auth" href="index.html"><span class="brand__mark">D</span><span>Domus</span></a><p class="eyebrow">Besplatan profil</p><h1>Vaša potraga, organizovana na jednom mjestu.</h1><p>Objavite nekretninu, pošaljite upit ili pratite ponude kroz jednostavan Domus profil.</p></div>
     <div class="login-container">
-        <h2>Registracija</h2>
+        <p class="eyebrow">Novi korisnik</p><h2>Registracija</h2>
         <form id="registerForm">
             <div class="form-group">
                 <label for="ime">Ime:</label>
@@ -37,15 +39,16 @@
                 <input type="password" id="password-confirm" name="password-confirm" required>
             </div>
 
-            <button type="submit" id="dugme">Registruj se</button>
+            <button type="submit" id="dugme">Kreiraj profil</button>
         </form>
 
         <div id="areaBelow"></div>
         <p class="link-registracija">Već imate nalog? <a href="prijava.html">Prijavite se</a></p>
-    </div>
+    </div></main>
 
     <script src="../scripts/utils/helpers.js"></script>
     <script src="../scripts/api/PoziviAjax.js"></script>
+    <script src="../scripts/components/siteHeader.js"></script>
     <script src="../scripts/pages/registracija.js"></script>
 </body>
 </html>

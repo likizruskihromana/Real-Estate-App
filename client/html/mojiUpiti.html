@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moje aktivnosti</title>
+    <title>Moje aktivnosti — Domus</title>
+    <link rel="stylesheet" href="../style/site.css">
     <link rel="stylesheet" href="../style/mojiUpiti.css">
+    <link rel="stylesheet" href="../style/workspace.css">
 </head>
 <body>
-    <iframe src="/meni.html"></iframe>
-
-    <div class="aktivnosti-container">
-        <h1>Moje aktivnosti</h1>
+    <header id="site-header"></header><main class="workspace-page"><div class="aktivnosti-container">
+        <div class="workspace-heading"><p class="eyebrow">Korisnički prostor</p><h1>Moje aktivnosti</h1><p>Pratite pitanja i ponude koje ste poslali.</p></div>
 
         <div class="tabovi">
             <button type="button" class="tab-dugme aktivan" data-tab="upiti">Moji upiti</button>
@@ -24,10 +24,11 @@
         <div id="tab-ponude" class="tab-sadrzaj">
             <div id="ponude-sadrzaj" class="loading-state">Učitavanje...</div>
         </div>
-    </div>
+    </div></main>
 
     <script src="../scripts/utils/helpers.js"></script>
     <script src="../scripts/api/PoziviAjax.js"></script>
+    <script src="../scripts/components/siteHeader.js"></script>
     <script src="../scripts/pages/mojiUpiti.js"></script>
 </body>
 </html>

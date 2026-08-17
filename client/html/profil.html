@@ -4,19 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil</title>
+    <title>Moj profil — Domus</title>
+    <link rel="stylesheet" href="../style/site.css">
     <link rel="stylesheet" type="text/css" href="../style/profil.css">
+    <link rel="stylesheet" href="../style/workspace.css">
 </head>
 
 <body>
-    <iframe src="/meni.html"></iframe>
-
-    <div class="user-profil" id="user-profil">
+    <header id="site-header"></header>
+    <main class="workspace-page"><div class="workspace-heading shell"><p class="eyebrow">Korisnički prostor</p><h1>Moj profil</h1><p>Upravljajte ličnim podacima i pregledajte svoju aktivnost.</p></div><div class="user-profil" id="user-profil">
         <div class="loading-state">Učitavanje profila...</div>
-    </div>
+    </div></main>
 
     <script src="../scripts/utils/helpers.js"></script>
     <script src="../scripts/api/PoziviAjax.js"></script>
+    <script src="../scripts/components/siteHeader.js"></script>
     <script src="../scripts/pages/profil.js"></script>
 </body>
 

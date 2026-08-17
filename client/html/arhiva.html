@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arhiva prodanih nekretnina</title>
+    <title>Prodane nekretnine — Domus</title>
+    <link rel="stylesheet" href="../style/site.css">
     <link rel="stylesheet" href="../style/arhiva.css">
+    <link rel="stylesheet" href="../style/workspace.css">
 </head>
 <body>
-    <iframe src="/meni.html"></iframe>
-
-    <div class="arhiva-container">
+    <header id="site-header"></header><main class="workspace-page"><div class="arhiva-container">
         <div class="arhiva-header">
-            <h1>Arhiva prodanih nekretnina</h1>
+            <p class="eyebrow">Uspješno zaključeni oglasi</p><h1>Prodane nekretnine</h1>
             <p class="arhiva-opis">Pregled svih nekretnina koje su uspješno prodane putem naše platforme.</p>
         </div>
         <div id="arhiva-sadrzaj" class="loading-state">Učitavanje...</div>
-    </div>
+    </div></main>
 
     <script src="../scripts/utils/helpers.js"></script>
     <script src="../scripts/api/PoziviAjax.js"></script>
+    <script src="../scripts/components/siteHeader.js"></script>
     <script src="../scripts/pages/arhiva.js"></script>
 </body>
 </html>
