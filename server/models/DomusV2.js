@@ -1,0 +1,88 @@
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => ({
+  Organizacija: sequelize.define('Organizacija', {
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    naziv: { type: DataTypes.STRING(160), allowNull: false },
+    slug: { type: DataTypes.STRING(180), allowNull: false, unique: true },
+    opis: DataTypes.TEXT,
+    grad: DataTypes.STRING(100),
+    telefon: DataTypes.STRING(40),
+    web: DataTypes.STRING(255),
+    registracijskiBroj: DataTypes.STRING(100),
+    status: { type: DataTypes.ENUM('PENDING', 'VERIFIED', 'REJECTED', 'SUSPENDED'), defaultValue: 'PENDING' },
+    razlogOdluke: DataTypes.TEXT,
+    verificiranaAt: DataTypes.DATE,
+  }, { freezeTableName: true, tableName: 'organizacija' }),
+  ClanstvoOrganizacije: sequelize.define('ClanstvoOrganizacije', {
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    uloga: { type: DataTypes.ENUM('OWNER', 'MANAGER', 'AGENT'), defaultValue: 'AGENT' },
+    status: { type: DataTypes.ENUM('INVITED', 'ACTIVE', 'REVOKED'), defaultValue: 'ACTIVE' },
+  }, { freezeTableName: true, tableName: 'clanstvo_organizacije' }),
+  Razgovor: sequelize.define('Razgovor', {
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    status: { type: DataTypes.ENUM('OPEN', 'CLOSED', 'BLOCKED'), defaultValue: 'OPEN' },
+    zadnjaPorukaAt: DataTypes.DATE,
+  }, { freezeTableName: true, tableName: 'razgovor' }),
+  Poruka: sequelize.define('Poruka', {
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    tekst: { type: DataTypes.TEXT, allowNull: false },
+    procitanoAt: DataTypes.DATE,
+  }, { freezeTableName: true, tableName: 'poruka_v2' }),
+  TerminPregleda: sequelize.define('TerminPregleda', {
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    predlozeniTermin: { type: DataTypes.DATE, allowNull: false },
+    alternativniTermini: DataTypes.JSON,
+    status: { type: DataTypes.ENUM('PENDING', 'CONFIRMED', 'RESCHEDULED', 'DECLINED', 'CANCELLED', 'COMPLETED'), defaultValue: 'PENDING' },
+    odgovor: DataTypes.TEXT,
+  }, { freezeTableName: true, tableName: 'termin_pregleda' }),
+  PregovarackaPonuda: sequelize.define('PregovarackaPonuda', {
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    iznos: { type: DataTypes.DECIMAL(12, 2), allowNull: false },
+    poruka: DataTypes.TEXT,
+    status: { type: DataTypes.ENUM('SUBMITTED', 'COUNTERED', 'ACCEPTED', 'REJECTED', 'WITHDRAWN', 'EXPIRED'), defaultValue: 'SUBMITTED' },
+  }, { freezeTableName: true, tableName: 'pregovaracka_ponuda' }),
+  JavniFaq: sequelize.define('JavniFaq', {
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    pitanje: { type: DataTypes.TEXT, allowNull: false },
+    odgovor: { type: DataTypes.TEXT, allowNull: false },
+    status: { type: DataTypes.ENUM('PUBLISHED', 'HIDDEN'), defaultValue: 'PUBLISHED' },
+  }, { freezeTableName: true, tableName: 'javni_faq' }),
+  Obavijest: sequelize.define('Obavijest', {
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    tip: { type: DataTypes.STRING(60), allowNull: false },
+    naslov: { type: DataTypes.STRING(160), allowNull: false },
+    poruka: { type: DataTypes.STRING(500), allowNull: false },
+    link: DataTypes.STRING(255),
+    procitanoAt: DataTypes.DATE,
+  }, { freezeTableName: true, tableName: 'obavijest' }),
+  ActivityEvent: sequelize.define('ActivityEvent', {
+    id: { type: DataTypes.BIGINT, autoIncrement: true, primaryKey: true },
+    tip: { type: DataTypes.STRING(80), allowNull: false },
+    entitetTip: DataTypes.STRING(60),
+    entitetId: DataTypes.INTEGER,
+    metadata: DataTypes.JSON,
+  }, { freezeTableName: true, tableName: 'activity_event', updatedAt: false }),
+  AdminAuditLog: sequelize.define('AdminAuditLog', {
+    id: { type: DataTypes.BIGINT, autoIncrement: true, primaryKey: true },
+    akcija: { type: DataTypes.STRING(80), allowNull: false },
+    entitetTip: { type: DataTypes.STRING(60), allowNull: false },
+    entitetId: DataTypes.INTEGER,
+    razlog: { type: DataTypes.STRING(500), allowNull: false },
+    metadata: DataTypes.JSON,
+  }, { freezeTableName: true, tableName: 'admin_audit_log', updatedAt: false }),
+  PrijavaSadrzaja: sequelize.define('PrijavaSadrzaja', {
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    tip: { type: DataTypes.ENUM('PORUKA', 'OGLAS', 'FAQ'), allowNull: false },
+    entitetId: { type: DataTypes.INTEGER, allowNull: false },
+    razlog: { type: DataTypes.STRING(500), allowNull: false },
+    snapshot: DataTypes.JSON,
+    status: { type: DataTypes.ENUM('OPEN', 'RESOLVED', 'DISMISSED'), defaultValue: 'OPEN' },
+  }, { freezeTableName: true, tableName: 'prijava_sadrzaja' }),
+  OglasRevizija: sequelize.define('OglasRevizija', {
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    podaci: { type: DataTypes.JSON, allowNull: false },
+    status: { type: DataTypes.ENUM('PENDING_REVIEW', 'APPROVED', 'CHANGES_REQUESTED', 'REJECTED'), defaultValue: 'PENDING_REVIEW' },
+    razlogOdluke: DataTypes.TEXT,
+  }, { freezeTableName: true, tableName: 'oglas_revizija' }),
+});

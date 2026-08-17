@@ -1,0 +1,10 @@
+const router=require('express').Router();const c=require('../controllers/v2Controller');const {requireAuth,requireRoles}=require('../middleware/auth');
+router.get('/nekretnine/:slug/slicne',c.similar);router.get('/nekretnine/:id/faq',c.faq);router.get('/nekretnine/:slug',c.propertyDetail);
+router.get('/organizacije',c.organizations);router.get('/organizacije/:slug',c.organization);router.post('/organizacije',requireAuth,c.createOrganization);
+router.get('/razgovori',requireAuth,c.conversations);router.post('/razgovori',requireAuth,c.createConversation);router.get('/razgovori/:id',requireAuth,c.conversation);router.post('/razgovori/:id/poruke',requireAuth,c.sendMessage);router.post('/razgovori/:id/faq',requireAuth,c.publishFaq);
+router.get('/termini',requireAuth,c.appointments);router.post('/termini',requireAuth,c.createAppointment);router.patch('/termini/:id',requireAuth,c.updateAppointment);
+router.get('/pregovaracke-ponude',requireAuth,c.offers);router.post('/pregovaracke-ponude',requireAuth,c.createOffer);router.patch('/pregovaracke-ponude/:id',requireAuth,c.updateOffer);
+router.get('/obavijesti',requireAuth,c.notifications);router.get('/obavijesti/stream',requireAuth,c.notificationStream);router.patch('/obavijesti/:id/procitano',requireAuth,c.readNotification);router.post('/prijave',requireAuth,c.report);
+const admin=requireRoles('ANALYST','MODERATOR','SUPER_ADMIN'),moderator=requireRoles('MODERATOR','SUPER_ADMIN');
+router.get('/admin/dashboard',admin,c.adminDashboard);router.get('/admin/analitika',admin,c.adminAnalytics);router.get('/admin/korisnici',admin,c.adminUsers);router.get('/admin/korisnici/:id',admin,c.adminUser);router.patch('/admin/korisnici/:id',moderator,c.adminUpdateUser);router.get('/admin/aktivnosti',admin,c.adminActivity);router.get('/admin/:kind(nekretnine|organizacije|moderation)',admin,c.adminQueue);router.patch('/admin/:kind(nekretnine|organizacije|moderation)/:id',moderator,c.adminDecision);
+module.exports=router;

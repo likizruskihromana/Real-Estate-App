@@ -15,6 +15,12 @@ npm start
 # Development mod sa auto-restartom
 npm run dev
 
+# React razvojni server (API se prosljeđuje na port 3000)
+npm run client:dev
+
+# Produkcijski React build
+npm run build
+
 # Kreiraj ili ažuriraj šemu kontrolisanim migracijama
 npm run migrate
 
@@ -52,7 +58,7 @@ docker-compose down -v
 
 - **Backend**: Node.js, Express, Sequelize
 - **Database**: MySQL
-- **Frontend**: Vanilla JavaScript, HTML, CSS
+- **Frontend**: React, TypeScript, Vite, React Router, TanStack Query
 - **DevOps**: Docker, Docker Compose
 
 Za lokalni razvoj potreban je Node.js 22 ili noviji podržani LTS runtime.
@@ -60,7 +66,7 @@ Za lokalni razvoj potreban je Node.js 22 ili noviji podržani LTS runtime.
 ## 📁 Struktura Projekta
 
 ```
-├── client/     # Frontend (HTML, CSS, JS)
+├── client/     # React frontend; legacy HTML ostaje privremeno radi rollbacka
 ├── server/     # Backend (Express, Sequelize, MySQL)
 └── uploads/    # Trajne fotografije nekretnina (sadržaj se ne commit u Git)
 ```
@@ -82,6 +88,9 @@ automatski; produkcijska baza treba sadržavati tu tabelu prije pokretanja.
 
 ## 🛠️ API Endpoints
 
+React aplikacija koristi standardizirani `/api/v2` odgovor oblika `{ data, meta? }`.
+Legacy API ostaje dostupan tokom prijelaznog perioda.
+
 - `POST /api/auth/login` - Prijava
 - `POST /api/auth/logout` - Odjava
 - `GET /api/nekretnine` - Sve nekretnine
@@ -95,6 +104,14 @@ automatski; produkcijska baza treba sadržavati tu tabelu prije pokretanja.
 - `DELETE /api/sacuvano/pretrage/:id` - Obriši sačuvanu pretragu
 - `POST /api/upiti` - Dodaj upit
 - `GET /api/upiti/moji` - Moji upiti
+- `GET /api/v2/auth/session` - Trenutni korisnik i sistemska uloga
+- `POST /api/v2/auth/register|login` - Registracija ili prijava usernameom/emailom
+- `GET|POST /api/v2/razgovori` - Privatni inbox vezan za oglas
+- `GET|POST|PATCH /api/v2/termini` - Strukturirani termini pregleda
+- `GET|POST|PATCH /api/v2/pregovaracke-ponude` - Neobavezujuće ponude
+- `GET|POST /api/v2/organizacije` - Agencije i zahtjev za verifikaciju
+- `GET /api/v2/obavijesti/stream` - Server-Sent Events kanal obavijesti
+- `GET /api/v2/admin/dashboard|analitika` - Admin KPI i funnel
 
 Liste podržavaju opt-in paginaciju pomoću `?page=1&limit=20` (maksimalni limit
 je 100). Paginiran odgovor ima `items` i `pagination`; bez parametara se zadržava
@@ -108,10 +125,16 @@ u kontejner kako bi fotografije preživjele ponovno kreiranje aplikacije.
 
 ```bash
 npm test
+npm run test:client
+npx tsc -p client/tsconfig.json --noEmit
+npm run build
 npm run test:unit
 npm run test:integration
 npm audit --omit=dev
 ```
+
+Prije migracije `004-domus-v2` preporučuje se SQL backup. Lokalni backup treba
+držati u `.dist/backups/`; taj direktorij je isključen iz Gita.
 
 ## 📄 License
 

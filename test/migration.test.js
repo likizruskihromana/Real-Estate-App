@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const migration = require('../server/migrations/001-initial-schema');
 const imageMigration = require('../server/migrations/002-property-images');
 const savedMigration = require('../server/migrations/003-saved-items');
+const domusV2Migration = require('../server/migrations/004-domus-v2');
 
 test('početna migracija odbija djelimično postojeću šemu', async () => {
   const queryInterface = { showAllTables: async () => ['korisnik'] };
@@ -56,4 +57,25 @@ test('migracija sačuvanih stavki kreira obje tabele i jedinstveni indeks', asyn
   await savedMigration.up({ queryInterface, transaction: {} });
   assert.deepEqual(pozivi.filter((poziv) => poziv[0] === 'table').map((poziv) => poziv[1]), ['omiljena_nekretnina', 'sacuvana_pretraga']);
   assert.equal(pozivi.find((poziv) => poziv[3]?.name === 'omiljena_korisnik_nekretnina_uq')[3].unique, true);
+});
+
+test('Domus v2 migracija proširuje postojeće podatke bez brisanja legacy tabela', async () => {
+  const tables = ['korisnik', 'nekretnina', 'upit', 'zahtjev', 'ponuda', 'komentar'];
+  const created = [];
+  const added = [];
+  const queryInterface = {
+    showAllTables: async () => tables,
+    describeTable: async () => ({}),
+    addColumn: async (table, column) => { added.push(`${table}.${column}`); },
+    createTable: async (name) => { created.push(name); },
+    addIndex: async () => {},
+    bulkUpdate: async () => {},
+  };
+  await domusV2Migration.up({ queryInterface, transaction: {} });
+  assert.ok(added.includes('korisnik.systemRole'));
+  assert.ok(added.includes('nekretnina.status'));
+  assert.ok(created.includes('razgovor'));
+  assert.ok(created.includes('activity_event'));
+  assert.equal(created.includes('upit'), false);
+  assert.equal(created.includes('komentar'), false);
 });

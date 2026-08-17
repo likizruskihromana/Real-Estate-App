@@ -9,6 +9,8 @@ const zahtjevRoutes = require('./zahtjevRoutes');
 const ponudaRoutes = require('./ponudaRoutes');
 const adminRoutes = require('./adminRoutes');
 const sacuvanoRoutes = require('./sacuvanoRoutes');
+const v2AuthRoutes = require('./v2AuthRoutes');
+const v2Routes = require('./v2Routes');
 
 router.use('/auth', authRoutes);
 router.use('/korisnik', korisnikRoutes);
@@ -18,5 +20,7 @@ router.use('/zahtjevi', zahtjevRoutes);
 router.use('/ponude', ponudaRoutes);
 router.use('/admin', adminRoutes);
 router.use('/sacuvano', sacuvanoRoutes);
+router.use('/v2/auth', v2AuthRoutes);
+router.use('/v2', v2Routes);
 
 module.exports = router;

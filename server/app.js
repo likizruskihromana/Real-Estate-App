@@ -34,7 +34,11 @@ function createApp({ sessionStore, serveStatic = true } = {}) {
   });
 
   app.use(csrfProtection);
-  if (serveStatic) app.use(express.static(path.join(__dirname, '../client')));
+  const clientRoot = path.join(__dirname, '../client');
+  const reactDist = path.join(clientRoot, 'dist');
+  if (serveStatic) app.use(express.static(reactDist));
+  // Legacy resursi ostaju dostupni tokom postepene migracije.
+  if (serveStatic) app.use(express.static(clientRoot));
   if (serveStatic) app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
     fallthrough: false,
     maxAge: config.server.nodeEnv === 'production' ? '7d' : 0,
@@ -51,10 +55,17 @@ function createApp({ sessionStore, serveStatic = true } = {}) {
       'arhiva.html', 'index.html',
       'sacuvano.html',
     ];
-    htmlRoutes.forEach((file) => {
-      app.get(`/${file}`, (req, res) => res.sendFile(path.join(__dirname, '../client/html', file)));
+    const redirects = {
+      'nekretnine.html':'/nekretnine','detalji.html':'/nekretnine','prijava.html':'/prijava',
+      'registracija.html':'/registracija','profil.html':'/profil','statistika.html':'/admin/analitika',
+      'ponude.html':'/ponude','mojiUpiti.html':'/inbox','admin.html':'/admin','arhiva.html':'/nekretnine',
+      'sacuvano.html':'/sacuvano','meni.html':'/moji-oglasi','index.html':'/',
+    };
+    htmlRoutes.forEach((file) => app.get(`/${file}`, (req, res) => res.redirect(302, redirects[file] || '/')));
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api/') || req.path.startsWith('/uploads/')) return next();
+      res.sendFile(path.join(reactDist, 'index.html'), (error) => error ? next() : undefined);
     });
-    app.get('/', (req, res) => res.redirect('/index.html'));
   }
 
   app.use(errorHandler);

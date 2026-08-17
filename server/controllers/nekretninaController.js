@@ -1,6 +1,6 @@
 const fs = require('fs/promises');
 const path = require('path');
-const { sequelize, Nekretnina, Upit, Zahtjev, Ponuda, Korisnik, Komentar, SlikaNekretnine } = require('../models');
+const { sequelize, Nekretnina, Upit, Zahtjev, Ponuda, Korisnik, Komentar, SlikaNekretnine, OglasRevizija, ActivityEvent } = require('../models');
 const { uploadsDir } = require('../middleware/upload');
 
 const DOZVOLJENI_TIPOVI = ['Stan', 'Kuća', 'Poslovni prostor'];
@@ -12,6 +12,8 @@ const slikeInclude = () => ({
   separate: true,
   order: [['glavna', 'DESC'], ['redoslijed', 'ASC'], ['id', 'ASC']],
 });
+const slugify = (value) => String(value || 'oglas').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 140);
+const NOVA_POLJA = ['namjena','grad','naselje','punaAdresa','latPriblizno','lngPriblizno','latTacno','lngTacno','brojSoba','brojKupatila','sprat','brojSpratova','parking','balkon','lift','namjestenost','stanje','energetskaKlasa','dostupnoOd','pogodnosti','OrganizacijaId','DodijeljeniAgentId'];
 
 function validirajPodatke(body, { zahtijevajSvaPolja }) {
   const greske = [];
@@ -49,7 +51,7 @@ exports.getAll = async (req, res) => {
   try {
     const stranica = pagination.parametri(req.query);
     const opcije = {
-      where: { kupljeno: false },
+      where: { kupljeno: false, status: 'PUBLISHED' },
       include: [slikeInclude()],
       order: [['datum_objave', 'DESC']],
       ...(stranica.enabled ? { limit: stranica.limit, offset: stranica.offset } : {}),
@@ -106,6 +108,7 @@ exports.create = async (req, res) => {
       return res.status(400).json({ greska: greske.join(' ') });
     }
 
+    if (!req.korisnik.email || !req.korisnik.emailVerifiedAt) return res.status(403).json({ greska: 'Potvrdite email prije objave oglasa.' });
     const { tip_nekretnine, naziv, kvadratura, cijena, tip_grijanja, lokacija, godina_izgradnje, opis } = req.body;
 
     const nekretnina = await Nekretnina.create({
@@ -119,7 +122,13 @@ exports.create = async (req, res) => {
       datum_objave: new Date().toISOString().slice(0, 10),
       opis: opis || null,
       KorisnikId: req.session.userId,
+      slug: `${slugify(naziv)}-${Date.now().toString(36)}`,
+      status: 'PENDING_REVIEW',
+      ...Object.fromEntries(NOVA_POLJA.filter((key) => req.body[key] !== undefined).map((key) => [key, req.body[key]])),
     });
+
+    await OglasRevizija.create({ NekretninaId: nekretnina.id, AutorId: req.session.userId, podaci: nekretnina.toJSON(), status: 'PENDING_REVIEW' });
+    await ActivityEvent.create({ tip: 'LISTING_SUBMITTED', ActorId: req.session.userId, entitetTip: 'NEKRETNINA', entitetId: nekretnina.id, metadata: { status: 'PENDING_REVIEW' } }).catch(() => {});
 
     res.status(201).json(nekretnina);
   } catch (error) {
@@ -145,15 +154,11 @@ exports.update = async (req, res) => {
       return res.status(400).json({ greska: greske.join(' ') });
     }
 
-    const dozvoljenaPolja = ['tip_nekretnine', 'naziv', 'kvadratura', 'cijena', 'tip_grijanja', 'lokacija', 'godina_izgradnje', 'opis'];
-    dozvoljenaPolja.forEach((polje) => {
-      if (req.body[polje] !== undefined) {
-        nekretnina[polje] = typeof req.body[polje] === 'string' ? req.body[polje].trim() : req.body[polje];
-      }
-    });
-
-    await nekretnina.save();
-    res.status(200).json(nekretnina);
+    const dozvoljenaPolja = ['tip_nekretnine', 'naziv', 'kvadratura', 'cijena', 'tip_grijanja', 'lokacija', 'godina_izgradnje', 'opis', ...NOVA_POLJA];
+    const podaci = nekretnina.toJSON();
+    dozvoljenaPolja.forEach((polje) => { if (req.body[polje] !== undefined) podaci[polje] = typeof req.body[polje] === 'string' ? req.body[polje].trim() : req.body[polje]; });
+    const revizija = await OglasRevizija.create({ NekretninaId: nekretnina.id, AutorId: req.session.userId, podaci, status: 'PENDING_REVIEW' });
+    res.status(202).json({ poruka: 'Izmjene su poslane na provjeru.', revizija });
   } catch (error) {
     console.error('Error updating property:', error);
     res.status(500).json({ greska: 'Internal Server Error' });
@@ -227,7 +232,7 @@ exports.getTop5 = async (req, res) => {
 
   try {
     const nekretnine = await Nekretnina.findAll({
-      where: { lokacija },
+      where: { lokacija, status: 'PUBLISHED' },
       include: [slikeInclude()],
       order: [['datum_objave', 'DESC']],
       limit: 5,

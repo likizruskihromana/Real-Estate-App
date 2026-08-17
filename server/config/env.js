@@ -26,4 +26,13 @@ module.exports = {
   bcrypt: {
     rounds: parseInt(process.env.BCRYPT_ROUNDS) || 10,
   },
+  appUrl: process.env.APP_URL || 'http://localhost:3000',
+  smtp: {
+    host: process.env.SMTP_HOST || '',
+    port: parseInt(process.env.SMTP_PORT) || 587,
+    secure: process.env.SMTP_SECURE === 'true',
+    user: process.env.SMTP_USER || '',
+    password: process.env.SMTP_PASSWORD || '',
+    from: process.env.SMTP_FROM || 'Domus <no-reply@domus.local>',
+  },
 };

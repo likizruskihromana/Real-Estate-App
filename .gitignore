@@ -6,5 +6,7 @@ uploads/nekretnine/*
 !uploads/nekretnine/.gitkeep
 coverage/
 logs/
+client/dist/
+.dist/
 *.log
 .DS_Store

@@ -5,6 +5,10 @@
   "main": "server/index.js",
   "scripts": {
     "test": "node --test",
+    "test:client": "vitest run --config client/vite.config.ts",
+    "client:dev": "vite --config client/vite.config.ts",
+    "client:build": "vite build --config client/vite.config.ts",
+    "build": "npm run client:build",
     "test:unit": "node --test test/securityMiddleware.test.js",
     "test:integration": "node --test test/api.integration.test.js",
     "start": "node server/index.js",
@@ -27,19 +31,41 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@hookform/resolvers": "^5.9.0",
+    "@tanstack/react-query": "^5.101.4",
     "bcrypt": "^6.0.0",
     "dotenv": "^16.3.1",
     "express": "^4.21.2",
     "express-mysql-session": "^3.0.3",
     "express-session": "^1.18.1",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^1.31.0",
     "multer": "^2.2.0",
     "mysql2": "^3.12.0",
-    "sequelize": "^6.37.5"
+    "nodemailer": "^9.0.5",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-hook-form": "^7.85.0",
+    "react-leaflet": "^5.0.0",
+    "react-router-dom": "^7.18.2",
+    "sequelize": "^6.37.5",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.4",
+    "@types/leaflet": "^1.9.22",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^6.0.5",
     "autoprefixer": "^10.4.21",
+    "jsdom": "^29.1.1",
     "nodemon": "^3.0.2",
     "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.18"
+    "tailwindcss": "^3.4.18",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.1",
+    "vitest": "^4.1.10"
   }
 }
