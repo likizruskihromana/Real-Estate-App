@@ -7,6 +7,11 @@ module.exports = (sequelize) => sequelize.define('SlikaNekretnine', {
   originalName: { type: DataTypes.STRING(255), allowNull: false },
   mimeType: { type: DataTypes.STRING(100), allowNull: false },
   velicina: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false },
+  thumbnailUrl: { type: DataTypes.STRING(500), allowNull: true },
+  mediumUrl: { type: DataTypes.STRING(500), allowNull: true },
+  largeUrl: { type: DataTypes.STRING(500), allowNull: true },
+  sirina: { type: DataTypes.INTEGER.UNSIGNED, allowNull: true },
+  visina: { type: DataTypes.INTEGER.UNSIGNED, allowNull: true },
   glavna: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
   redoslijed: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false, defaultValue: 0 },
 }, {

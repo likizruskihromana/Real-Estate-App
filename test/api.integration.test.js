@@ -26,6 +26,11 @@ test('nepoznata API ruta vraća JSON 404 i request ID', async () => {
   assert.equal(body.requestId, response.headers.get('x-request-id'));
 });
 
+test('v2 greške koriste standardni error envelope', async () => {
+  const response=await fetch(`${baseUrl}/api/v2/ne-postoji`);const body=await response.json();
+  assert.equal(response.status,404);assert.equal(body.error.code,'NOT_FOUND');assert.equal(body.error.requestId,response.headers.get('x-request-id'));
+});
+
 test('zaštićena ruta odbija anonimnog korisnika', async () => {
   const response = await fetch(`${baseUrl}/api/korisnik`);
   assert.equal(response.status, 401);

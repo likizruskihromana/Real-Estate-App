@@ -5,13 +5,15 @@ const komentarController = require('../controllers/komentarController');
 const { requireAuth } = require('../middleware/auth');
 const slikaController = require('../controllers/slikaController');
 const { uploadJedneSlike } = require('../middleware/upload');
+const { legacyReadOnly } = require('../middleware/legacyReadOnly');
+const { uploadRateLimit } = require('../middleware/actionRateLimit');
 
 router.get('/', nekretninaController.getAll);
 router.get('/top5', nekretninaController.getTop5);
 router.get('/arhiva', nekretninaController.getArhiva);
 router.get('/moje', requireAuth, nekretninaController.getMoje);
 router.post('/', requireAuth, nekretninaController.create);
-router.post('/:id/slike', requireAuth, uploadJedneSlike, slikaController.create);
+router.post('/:id/slike', requireAuth, uploadRateLimit, uploadJedneSlike, slikaController.create);
 router.patch('/:id/slike/:slikaId/glavna', requireAuth, slikaController.setGlavna);
 router.delete('/:id/slike/:slikaId', requireAuth, slikaController.remove);
 router.get('/:id', nekretninaController.getById);
@@ -21,7 +23,7 @@ router.get('/:id/interesovanja', nekretninaController.getInteresovanja);
 
 // Komentari
 router.get('/:id/komentari', komentarController.getKomentariZaNekretninu);
-router.post('/:id/komentar', requireAuth, komentarController.createKomentar);
-router.post('/:id/komentar/:komentarId/odgovor', requireAuth, komentarController.createOdgovor);
+router.post('/:id/komentar', legacyReadOnly, requireAuth, komentarController.createKomentar);
+router.post('/:id/komentar/:komentarId/odgovor', legacyReadOnly, requireAuth, komentarController.createOdgovor);
 
 module.exports = router;

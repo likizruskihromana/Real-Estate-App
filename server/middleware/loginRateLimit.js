@@ -14,6 +14,7 @@ function loginRateLimit(req, res, next) {
   }
   if (zapis.count >= MAX_POKUSAJA) {
     res.setHeader('Retry-After', Math.ceil((zapis.resetAt - sada) / 1000));
+    if (req.originalUrl?.startsWith('/api/v2/')) return res.status(429).json({error:{code:'RATE_LIMITED',message:'Previše pokušaja prijave. Pokušajte ponovo kasnije.',requestId:req.requestId}});
     return res.status(429).json({ greska: 'Previše pokušaja prijave. Pokušajte ponovo kasnije.' });
   }
 
@@ -22,4 +23,3 @@ function loginRateLimit(req, res, next) {
 }
 
 module.exports = { loginRateLimit };
-

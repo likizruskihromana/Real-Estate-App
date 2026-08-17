@@ -1,12 +1,16 @@
 .env
 .env.*
 !.env.example
+!.env.production.example
 node_modules/
 uploads/nekretnine/*
 !uploads/nekretnine/.gitkeep
 coverage/
+playwright-report/
+test-results/
 logs/
 client/dist/
 .dist/
 *.log
+backups/
 .DS_Store

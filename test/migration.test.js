@@ -4,6 +4,8 @@ const migration = require('../server/migrations/001-initial-schema');
 const imageMigration = require('../server/migrations/002-property-images');
 const savedMigration = require('../server/migrations/003-saved-items');
 const domusV2Migration = require('../server/migrations/004-domus-v2');
+const growthMigration = require('../server/migrations/005-growth-ux');
+const slugMigration = require('../server/migrations/006-public-slugs');
 
 test('početna migracija odbija djelimično postojeću šemu', async () => {
   const queryInterface = { showAllTables: async () => ['korisnik'] };
@@ -78,4 +80,19 @@ test('Domus v2 migracija proširuje postojeće podatke bez brisanja legacy tabel
   assert.ok(created.includes('activity_event'));
   assert.equal(created.includes('upit'), false);
   assert.equal(created.includes('komentar'), false);
+});
+
+test('Growth migracija dodaje search i image polja bez brisanja originala', async () => {
+  const added=[];const created=[];
+  const queryInterface={showAllTables:async()=>['sacuvana_pretraga','slika_nekretnine'],describeTable:async()=>({}),addColumn:async(t,c)=>added.push(`${t}.${c}`),createTable:async n=>created.push(n),addIndex:async()=>{}};
+  await growthMigration.up({queryInterface,transaction:{}});
+  assert.ok(added.includes('sacuvana_pretraga.kriteriji'));
+  assert.ok(added.includes('slika_nekretnine.largeUrl'));
+  assert.deepEqual(created,['podudaranje_sacuvane_pretrage']);
+});
+
+test('slug migracija popunjava stabilne javne identifikatore', async () => {
+  const updates=[];const queryInterface={bulkUpdate:async(_table,values,where)=>updates.push({values,where})};const sequelize={query:async()=>[[{id:7,naziv:'Četverosoban stan — Centar'}]]};
+  await slugMigration.up({queryInterface,sequelize,transaction:{}});
+  assert.deepEqual(updates,[{values:{slug:'cetverosoban-stan-centar-7'},where:{id:7}}]);
 });

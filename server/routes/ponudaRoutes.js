@@ -2,6 +2,9 @@ const { requireAuth } = require('../middleware/auth');
 const express = require('express');
 const router = express.Router();
 const ponudaController = require('../controllers/ponudaController');
+const { legacyReadOnly } = require('../middleware/legacyReadOnly');
+
+router.use(legacyReadOnly);
 
 router.get('/moje', requireAuth, ponudaController.getMojePonude);
 router.post('/:id', requireAuth, ponudaController.createPonuda);

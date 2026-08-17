@@ -17,7 +17,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
     if (!query.data?.korisnik) return;
     const source = new EventSource('/api/v2/obavijesti/stream', { withCredentials: true });
     source.addEventListener('notification', () => client.invalidateQueries({ queryKey: ['notifications'] }));
-    return () => source.close();
+    let fallback: number | undefined;
+    source.onerror = () => { source.close(); if (!fallback) fallback = window.setInterval(() => client.invalidateQueries({ queryKey: ['notifications'] }), 30_000); };
+    return () => { source.close(); if (fallback) window.clearInterval(fallback); };
   }, [client, query.data?.korisnik]);
   return <AuthContext.Provider value={{ user: query.data?.korisnik ?? null, loading: query.isLoading }}>{children}</AuthContext.Provider>;
 }

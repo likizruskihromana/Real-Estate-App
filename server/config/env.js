@@ -2,9 +2,13 @@ require('dotenv').config();
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 const sessionSecret = process.env.SESSION_SECRET || 'default_secret_change_me';
+const publicBaseUrl = process.env.PUBLIC_BASE_URL || process.env.APP_URL || 'http://localhost:3000';
 
 if (nodeEnv === 'production' && sessionSecret === 'default_secret_change_me') {
   throw new Error('SESSION_SECRET mora biti postavljen na sigurnu vrijednost u produkciji.');
+}
+if (nodeEnv === 'production' && (!process.env.DB_PASSWORD || !process.env.PUBLIC_BASE_URL || !process.env.SMTP_HOST || !process.env.SMTP_FROM)) {
+  throw new Error('DB_PASSWORD, PUBLIC_BASE_URL, SMTP_HOST i SMTP_FROM moraju biti postavljeni u produkciji.');
 }
 
 module.exports = {
@@ -26,7 +30,8 @@ module.exports = {
   bcrypt: {
     rounds: parseInt(process.env.BCRYPT_ROUNDS) || 10,
   },
-  appUrl: process.env.APP_URL || 'http://localhost:3000',
+  appUrl: publicBaseUrl,
+  publicBaseUrl,
   smtp: {
     host: process.env.SMTP_HOST || '',
     port: parseInt(process.env.SMTP_PORT) || 587,

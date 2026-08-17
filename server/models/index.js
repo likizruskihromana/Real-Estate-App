@@ -22,6 +22,7 @@ const Komentar = require('./Komentar')(sequelize); // <-- DODANO
 const SlikaNekretnine = require('./SlikaNekretnine')(sequelize);
 const OmiljenaNekretnina = require('./OmiljenaNekretnina')(sequelize);
 const SacuvanaPretraga = require('./SacuvanaPretraga')(sequelize);
+const PodudaranjeSacuvanePretrage = require('./PodudaranjeSacuvanePretrage')(sequelize);
 const v2 = require('./DomusV2')(sequelize);
 const { Organizacija, ClanstvoOrganizacije, Razgovor, Poruka, TerminPregleda, PregovarackaPonuda, JavniFaq, Obavijest, ActivityEvent, AdminAuditLog, PrijavaSadrzaja, OglasRevizija } = v2;
 
@@ -78,6 +79,10 @@ OmiljenaNekretnina.belongsTo(Korisnik, { foreignKey: 'KorisnikId' });
 OmiljenaNekretnina.belongsTo(Nekretnina, { foreignKey: 'NekretninaId' });
 Korisnik.hasMany(SacuvanaPretraga, { as: 'SacuvanePretrage', foreignKey: 'KorisnikId', onDelete: 'CASCADE' });
 SacuvanaPretraga.belongsTo(Korisnik, { foreignKey: 'KorisnikId' });
+SacuvanaPretraga.hasMany(PodudaranjeSacuvanePretrage, { foreignKey: 'SacuvanaPretragaId', onDelete: 'CASCADE' });
+PodudaranjeSacuvanePretrage.belongsTo(SacuvanaPretraga, { foreignKey: 'SacuvanaPretragaId' });
+Nekretnina.hasMany(PodudaranjeSacuvanePretrage, { foreignKey: 'NekretninaId', onDelete: 'CASCADE' });
+PodudaranjeSacuvanePretrage.belongsTo(Nekretnina, { foreignKey: 'NekretninaId' });
 
 Organizacija.belongsTo(Korisnik, { as: 'Kreator', foreignKey: 'KreatorId' });
 Organizacija.belongsToMany(Korisnik, { through: ClanstvoOrganizacije, as: 'Clanovi', foreignKey: 'OrganizacijaId', otherKey: 'KorisnikId' });
@@ -124,7 +129,7 @@ Nekretnina.prototype.getInteresovanja = async function () {
 
 module.exports = {
   sequelize, Korisnik, Nekretnina, Upit, Zahtjev, Ponuda, Komentar,
-  SlikaNekretnine, OmiljenaNekretnina, SacuvanaPretraga,
+  SlikaNekretnine, OmiljenaNekretnina, SacuvanaPretraga, PodudaranjeSacuvanePretrage,
   Organizacija, ClanstvoOrganizacije, Razgovor, Poruka, TerminPregleda,
   PregovarackaPonuda, JavniFaq, Obavijest, ActivityEvent, AdminAuditLog,
   PrijavaSadrzaja, OglasRevizija,

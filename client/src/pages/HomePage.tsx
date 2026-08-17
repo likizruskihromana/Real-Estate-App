@@ -2,15 +2,15 @@ import { ArrowRight, BadgeCheck, BarChart3, Search, ShieldCheck } from 'lucide-r
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { api } from '../lib/api';
+import { apiEnvelope } from '../lib/api';
 import type { Nekretnina } from '../types';
 import { PropertyCard } from '../components/PropertyCard';
 
 export function HomePage() {
   const [location, setLocation] = useState('');
   const navigate = useNavigate();
-  const query = useQuery({ queryKey: ['properties', 'featured'], queryFn: () => api<Nekretnina[] | { items: Nekretnina[] }>('/api/nekretnine?limit=6&page=1') });
-  const items = Array.isArray(query.data) ? query.data : query.data?.items || [];
+  const query = useQuery({ queryKey: ['properties', 'featured'], queryFn: () => apiEnvelope<Nekretnina[]>('/api/v2/nekretnine?pageSize=6&page=1') });
+  const items = query.data?.data || [];
   return <>
     <section className="hero">
       <div className="container hero-grid">

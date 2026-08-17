@@ -1,0 +1,78 @@
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Postavite MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME:?Postavite DB_NAME}
+      MYSQL_USER: ${DB_USER:?Postavite DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Postavite DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks: [domus_private]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:?Postavite DB_NAME}
+      DB_USER: ${DB_USER:?Postavite DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD:?Postavite DB_PASSWORD}
+      SESSION_SECRET: ${SESSION_SECRET:?Postavite SESSION_SECRET}
+      PUBLIC_BASE_URL: https://${DOMAIN:?Postavite DOMAIN}
+      SMTP_HOST: ${SMTP_HOST:?Postavite SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:?Postavite SMTP_FROM}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - uploads_data:/app/uploads
+    networks: [domus_private]
+    command: ["sh", "-c", "npm run migrate && node server/index.js"]
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:?Postavite DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+    networks: [domus_private]
+
+volumes:
+  mysql_data:
+  uploads_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  domus_private:
+    driver: bridge

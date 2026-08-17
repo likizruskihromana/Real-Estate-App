@@ -36,10 +36,10 @@ function csrfProtection(req, res, next) {
 
   const headerToken = req.get('X-CSRF-Token');
   if (!sigurnoJednako(cookieToken, headerToken)) {
+    if (req.originalUrl?.startsWith('/api/v2/')) return res.status(403).json({error:{code:'CSRF_INVALID',message:'Nevažeći CSRF token.',requestId:req.requestId}});
     return res.status(403).json({ greska: 'Nevažeći CSRF token.' });
   }
   next();
 }
 
 module.exports = { csrfProtection, procitajCookie };
-

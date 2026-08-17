@@ -7,6 +7,11 @@ export interface Slika {
   filename?: string;
   glavna?: boolean;
   altTekst?: string;
+  thumbnailUrl?: string;
+  mediumUrl?: string;
+  largeUrl?: string;
+  sirina?: number;
+  visina?: number;
 }
 
 export interface Nekretnina {
@@ -31,6 +36,10 @@ export interface Nekretnina {
   balkon?: boolean;
   lift?: boolean;
   energetskaKlasa?: string;
+  namjestenost?: string;
+  stanje?: string;
+  dostupnoOd?: string;
+  pogodnosti?: string[];
   kupljeno?: boolean;
   latPriblizno?: number;
   lngPriblizno?: number;
@@ -38,6 +47,16 @@ export interface Nekretnina {
   Korisnik?: { id: number; ime?: string; prezime?: string; username: string };
   Organizacija?: { id: number; naziv: string; slug: string; verificirana?: boolean };
 }
+
+export interface SearchCriteria {
+  lokacija?: string; tip?: string; namjena?: 'PRODAJA'|'NAJAM'; cijenaMin?: number; cijenaMax?: number;
+  kvadraturaMin?: number; kvadraturaMax?: number; sobeMin?: number; kupatilaMin?: number;
+  parking?: boolean; balkon?: boolean; lift?: boolean; namjestenost?: string; stanje?: string;
+  energetskaKlasa?: string; dostupnoOd?: string; sort?: 'najnovije'|'cijena-asc'|'cijena-desc'|'kvadratura-desc';
+}
+
+export interface SavedSearch { id:number; naziv:string; kriteriji:SearchCriteria; alertsEnabled:boolean; createdAt:string; }
+export interface FavoritesPayload { ids:number[]; items:Nekretnina[]; }
 
 export interface SessionUser {
   id: number;

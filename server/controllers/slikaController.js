@@ -2,6 +2,7 @@ const fs = require('fs/promises');
 const path = require('path');
 const { sequelize, Nekretnina, SlikaNekretnine } = require('../models');
 const { uploadsDir } = require('../middleware/upload');
+const { processImage, removeImageFiles } = require('../utils/imageVariants');
 
 async function nadjiNekretninuSaPristupom(req, res) {
   const nekretnina = await Nekretnina.findByPk(req.params.id);
@@ -59,6 +60,7 @@ exports.create = async (req, res) => {
       return res.status(400).json({ greska: 'Jedna nekretnina može imati najviše 8 fotografija.' });
     }
 
+    const variants = await processImage(req.file.filename);
     const slika = await sequelize.transaction(async (transaction) => {
       const jePrva = brojSlika === 0;
       return SlikaNekretnine.create({
@@ -67,6 +69,7 @@ exports.create = async (req, res) => {
         originalName: path.basename(req.file.originalname).slice(0, 255),
         mimeType: req.file.mimetype,
         velicina: req.file.size,
+        ...variants,
         glavna: jePrva,
         redoslijed: brojSlika,
         NekretninaId: nekretnina.id,
@@ -74,7 +77,10 @@ exports.create = async (req, res) => {
     });
     res.status(201).json(slika);
   } catch (error) {
-    if (req.file) await ukloniDatoteku(req.file.filename);
+    if (req.file) {
+      const stem = path.parse(req.file.filename).name;
+      await Promise.all([req.file.filename, `${stem}-thumbnail.webp`, `${stem}-medium.webp`, `${stem}-large.webp`].map(ukloniDatoteku));
+    }
     console.error('Upload fotografije nije uspio:', error);
     res.status(500).json({ greska: 'Fotografiju trenutno nije moguće sačuvati.' });
   }
@@ -107,7 +113,7 @@ exports.remove = async (req, res) => {
 
     const bilaGlavna = slika.glavna;
     await slika.destroy();
-    await ukloniDatoteku(slika.filename);
+    await removeImageFiles(slika);
     if (bilaGlavna) {
       const sljedeca = await SlikaNekretnine.findOne({ where: { NekretninaId: nekretnina.id }, order: [['redoslijed', 'ASC'], ['id', 'ASC']] });
       if (sljedeca) {
