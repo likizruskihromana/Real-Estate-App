@@ -1,4 +1,5 @@
-import { Bath, BedDouble, Heart, MapPin, MoveUpRight } from 'lucide-react';
+import { Bath, BedDouble, GitCompareArrows, Heart, MapPin, MoveUpRight } from 'lucide-react';
+import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, imageUrl, money } from '../lib/api';
@@ -10,8 +11,10 @@ export function PropertyCard({ item }: { item: Nekretnina }) {
   const { user } = useAuth(); const client=useQueryClient(); const navigate=useNavigate(); const location=useLocation();
   const favorites=useQuery({queryKey:['favorites'],queryFn:()=>api<FavoritesPayload>('/api/v2/omiljene'),enabled:!!user,staleTime:30000});
   const saved=!!favorites.data?.ids.includes(item.id);
+  const [compared,setCompared]=useState(()=>JSON.parse(localStorage.getItem('domus.compare')||'[]').includes(item.id));
   const toggle=useMutation({mutationFn:()=>api(`/api/v2/omiljene/${item.id}`,{method:saved?'DELETE':'POST'}),onMutate:async()=>{await client.cancelQueries({queryKey:['favorites']});const previous=client.getQueryData<FavoritesPayload>(['favorites']);if(previous)client.setQueryData<FavoritesPayload>(['favorites'],{...previous,ids:saved?previous.ids.filter(id=>id!==item.id):[...previous.ids,item.id],items:saved?previous.items.filter(x=>x.id!==item.id):[item,...previous.items]});return{previous}},onError:(_e,_v,ctx)=>ctx?.previous&&client.setQueryData(['favorites'],ctx.previous),onSettled:()=>client.invalidateQueries({queryKey:['favorites']})});
   const save=()=>user?toggle.mutate():navigate(`/prijava?next=${encodeURIComponent(location.pathname+location.search)}`);
+  const compare=()=>{const current:number[]=JSON.parse(localStorage.getItem('domus.compare')||'[]');const next=current.includes(item.id)?current.filter(x=>x!==item.id):current.length<4?[...current,item.id]:current;localStorage.setItem('domus.compare',JSON.stringify(next));setCompared(next.includes(item.id));window.dispatchEvent(new Event('domus:compare'))};
   return (
     <article className="property-card">
       <div className="property-image-wrap">
@@ -27,7 +30,7 @@ export function PropertyCard({ item }: { item: Nekretnina }) {
           {item.brojSoba ? <span><BedDouble size={16} /> {item.brojSoba}</span> : null}
           {item.brojKupatila ? <span><Bath size={16} /> {item.brojKupatila}</span> : null}
         </div>
-        <div className="card-price"><strong>{money(item.cijena)}</strong><Link to={link} aria-label="Otvori detalje"><MoveUpRight size={20} /></Link></div>
+        <div className="card-price"><strong>{money(item.cijena)}</strong><span className="card-tools"><button className={compared?'compare-button active':'compare-button'} onClick={compare} aria-pressed={compared} title="Uporedi"><GitCompareArrows size={17}/></button><Link to={link} aria-label="Otvori detalje"><MoveUpRight size={20} /></Link></span></div>
       </div>
     </article>
   );

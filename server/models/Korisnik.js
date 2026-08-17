@@ -19,6 +19,9 @@ module.exports = (sequelize) => {
     suspendedUntil: { type: DataTypes.DATE, allowNull: true },
     suspensionReason: { type: DataTypes.STRING(500), allowNull: true },
     deletedAt: { type: DataTypes.DATE, allowNull: true },
+    betaPublishingEnabledAt: { type: DataTypes.DATE, allowNull: true },
+    betaPublishingGrantedBy: { type: DataTypes.INTEGER, allowNull: true },
+    betaPublishingReason: { type: DataTypes.STRING(500), allowNull: true },
   }, {
     freezeTableName: true,
     tableName: 'korisnik',

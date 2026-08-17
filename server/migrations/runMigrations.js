@@ -7,8 +7,9 @@ const savedItems = require('./003-saved-items');
 const domusV2 = require('./004-domus-v2');
 const growthUx = require('./005-growth-ux');
 const publicSlugs = require('./006-public-slugs');
+const marketplaceOperations = require('./007-marketplace-operations');
 
-const migrations = [initialSchema, propertyImages, savedItems, domusV2, growthUx, publicSlugs];
+const migrations = [initialSchema, propertyImages, savedItems, domusV2, growthUx, publicSlugs, marketplaceOperations];
 
 async function osigurajMetaTabelu(queryInterface) {
   const tabele = (await queryInterface.showAllTables()).map(String).map((ime) => ime.toLowerCase());

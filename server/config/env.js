@@ -40,4 +40,18 @@ module.exports = {
     password: process.env.SMTP_PASSWORD || '',
     from: process.env.SMTP_FROM || 'Domus <no-reply@domus.local>',
   },
+  observability: {
+    logLevel: process.env.LOG_LEVEL || (nodeEnv === 'production' ? 'info' : 'debug'),
+    sentryDsn: process.env.SENTRY_DSN || '',
+    release: process.env.APP_RELEASE || '',
+    tracesSampleRate: Math.min(1, Math.max(0, Number(process.env.SENTRY_TRACES_SAMPLE_RATE || 0.1))),
+  },
+  beta: {
+    publishingRequired: process.env.BETA_PUBLISHING_REQUIRED !== 'false',
+    maxPublishedPerOwner: Math.max(1, Number(process.env.BETA_MAX_PUBLISHED_PER_OWNER || 20)),
+  },
+  analytics: {
+    posthogKey: process.env.POSTHOG_KEY || '',
+    posthogHost: process.env.POSTHOG_HOST || 'https://eu.i.posthog.com',
+  },
 };

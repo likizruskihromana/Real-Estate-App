@@ -1,8 +1,14 @@
 const crypto = require('crypto');
+const { logger, captureError } = require('../utils/observability');
 
 function requestContext(req, res, next) {
   req.requestId = req.get('X-Request-ID') || crypto.randomUUID();
   res.setHeader('X-Request-ID', req.requestId);
+  const startedAt = process.hrtime.bigint();
+  res.on('finish', () => {
+    const durationMs = Number(process.hrtime.bigint() - startedAt) / 1e6;
+    logger.info({ requestId: req.requestId, method: req.method, route: req.route?.path || req.path, status: res.statusCode, durationMs: Number(durationMs.toFixed(2)), userId: req.korisnik?.id || req.session?.userId || null }, 'http_request');
+  });
   next();
 }
 
@@ -22,7 +28,8 @@ function errorHandler(error, req, res, next) {
   const poruka = status < 500 ? (error.message || 'Zahtjev nije ispravan.') : 'Internal Server Error';
 
   if (status >= 500) {
-    console.error(`[${req.requestId}] Neočekivana greška:`, error);
+    logger.error({ err: error, requestId: req.requestId }, 'unexpected_error');
+    captureError(error, req);
   }
 
   if (req.path?.startsWith('/api/v2')) {

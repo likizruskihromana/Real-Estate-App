@@ -2,15 +2,18 @@ import { ArrowRight, BadgeCheck, BarChart3, Search, ShieldCheck } from 'lucide-r
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { apiEnvelope } from '../lib/api';
+import { api, apiEnvelope } from '../lib/api';
 import type { Nekretnina } from '../types';
 import { PropertyCard } from '../components/PropertyCard';
+import { useAuth } from '../auth/AuthContext';
 
 export function HomePage() {
   const [location, setLocation] = useState('');
   const navigate = useNavigate();
+  const {user}=useAuth();
   const query = useQuery({ queryKey: ['properties', 'featured'], queryFn: () => apiEnvelope<Nekretnina[]>('/api/v2/nekretnine?pageSize=6&page=1') });
-  const items = query.data?.data || [];
+  const recommended=useQuery({queryKey:['recommendations'],queryFn:()=>api<Nekretnina[]>('/api/v2/preporuke'),enabled:!!user});
+  const items = recommended.data?.length ? recommended.data : query.data?.data || [];
   return <>
     <section className="hero">
       <div className="container hero-grid">
@@ -33,7 +36,7 @@ export function HomePage() {
     </section>
     <section className="section">
       <div className="container">
-        <div className="section-heading"><div><span className="kicker">Izdvojeno</span><h2>Nekretnine vrijedne pažnje</h2></div><Link className="text-link" to="/nekretnine">Pogledaj sve <ArrowRight /></Link></div>
+        <div className="section-heading"><div><span className="kicker">{recommended.data?.length?'Prema vašim interesima':'Izdvojeno'}</span><h2>{recommended.data?.length?'Preporučeno za vas':'Nekretnine vrijedne pažnje'}</h2></div><Link className="text-link" to="/nekretnine">Pogledaj sve <ArrowRight /></Link></div>
         {query.isLoading ? <div className="card-grid">{[1,2,3].map(i => <div className="skeleton card-skeleton" key={i} />)}</div> :
           items.length ? <div className="card-grid">{items.slice(0, 6).map(item => <PropertyCard item={item} key={item.id} />)}</div> : <Empty title="Novi oglasi uskoro" />}
       </div>

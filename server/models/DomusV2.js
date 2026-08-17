@@ -13,6 +13,9 @@ module.exports = (sequelize) => ({
     status: { type: DataTypes.ENUM('PENDING', 'VERIFIED', 'REJECTED', 'SUSPENDED'), defaultValue: 'PENDING' },
     razlogOdluke: DataTypes.TEXT,
     verificiranaAt: DataTypes.DATE,
+    betaPublishingEnabledAt: DataTypes.DATE,
+    betaPublishingGrantedBy: DataTypes.INTEGER,
+    betaPublishingReason: DataTypes.STRING(500),
   }, { freezeTableName: true, tableName: 'organizacija' }),
   ClanstvoOrganizacije: sequelize.define('ClanstvoOrganizacije', {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -23,11 +26,14 @@ module.exports = (sequelize) => ({
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     status: { type: DataTypes.ENUM('OPEN', 'CLOSED', 'BLOCKED'), defaultValue: 'OPEN' },
     zadnjaPorukaAt: DataTypes.DATE,
+    zatvorenAt: DataTypes.DATE,
+    BlokiraoId: DataTypes.INTEGER,
   }, { freezeTableName: true, tableName: 'razgovor' }),
   Poruka: sequelize.define('Poruka', {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     tekst: { type: DataTypes.TEXT, allowNull: false },
     procitanoAt: DataTypes.DATE,
+    isporucenoAt: DataTypes.DATE,
   }, { freezeTableName: true, tableName: 'poruka_v2' }),
   TerminPregleda: sequelize.define('TerminPregleda', {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -47,6 +53,7 @@ module.exports = (sequelize) => ({
     pitanje: { type: DataTypes.TEXT, allowNull: false },
     odgovor: { type: DataTypes.TEXT, allowNull: false },
     status: { type: DataTypes.ENUM('PUBLISHED', 'HIDDEN'), defaultValue: 'PUBLISHED' },
+    uredjenoAt: DataTypes.DATE,
   }, { freezeTableName: true, tableName: 'javni_faq' }),
   Obavijest: sequelize.define('Obavijest', {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -82,7 +89,19 @@ module.exports = (sequelize) => ({
   OglasRevizija: sequelize.define('OglasRevizija', {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     podaci: { type: DataTypes.JSON, allowNull: false },
-    status: { type: DataTypes.ENUM('PENDING_REVIEW', 'APPROVED', 'CHANGES_REQUESTED', 'REJECTED'), defaultValue: 'PENDING_REVIEW' },
+    status: { type: DataTypes.ENUM('DRAFT', 'PENDING_REVIEW', 'APPROVED', 'CHANGES_REQUESTED', 'REJECTED'), defaultValue: 'DRAFT' },
     razlogOdluke: DataTypes.TEXT,
+    verzija: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 1 },
+    BaznaRevizijaId: DataTypes.INTEGER,
+    zakljucanaAt: DataTypes.DATE,
+    dovrseniKorak: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
   }, { freezeTableName: true, tableName: 'oglas_revizija' }),
+  PozivOrganizacije: sequelize.define('PozivOrganizacije', { id:{type:DataTypes.INTEGER,autoIncrement:true,primaryKey:true}, email:{type:DataTypes.STRING(255),allowNull:false}, uloga:{type:DataTypes.ENUM('OWNER','MANAGER','AGENT'),defaultValue:'AGENT'}, status:{type:DataTypes.ENUM('PENDING','ACCEPTED','EXPIRED','REVOKED'),defaultValue:'PENDING'}, tokenHash:{type:DataTypes.STRING(64),allowNull:false}, isticeAt:{type:DataTypes.DATE,allowNull:false} }, {freezeTableName:true,tableName:'poziv_organizacije'}),
+  DokumentVerifikacije: sequelize.define('DokumentVerifikacije', { id:{type:DataTypes.INTEGER,autoIncrement:true,primaryKey:true}, naziv:{type:DataTypes.STRING(255),allowNull:false}, filename:{type:DataTypes.STRING(255),allowNull:false}, mimeType:{type:DataTypes.STRING(100),allowNull:false}, velicina:{type:DataTypes.INTEGER.UNSIGNED,allowNull:false}, status:{type:DataTypes.ENUM('SUBMITTED','ACCEPTED','REJECTED'),defaultValue:'SUBMITTED'} }, {freezeTableName:true,tableName:'dokument_verifikacije'}),
+  BetaFeedback: sequelize.define('BetaFeedback', { id:{type:DataTypes.INTEGER,autoIncrement:true,primaryKey:true}, kategorija:{type:DataTypes.ENUM('BUG','UX','SEARCH','LISTING','COMMUNICATION','OTHER'),allowNull:false}, ocjena:DataTypes.TINYINT, poruka:{type:DataTypes.STRING(1500),allowNull:false}, putanja:{type:DataTypes.STRING(255),allowNull:false}, screenshotUrl:DataTypes.STRING(500), status:{type:DataTypes.ENUM('OPEN','REVIEWED','RESOLVED'),defaultValue:'OPEN'} }, {freezeTableName:true,tableName:'beta_feedback'}),
+  HistorijaTermina: sequelize.define('HistorijaTermina', { id:{type:DataTypes.INTEGER,autoIncrement:true,primaryKey:true}, prethodniStatus:DataTypes.STRING(30), noviStatus:{type:DataTypes.STRING(30),allowNull:false}, prethodniTermin:DataTypes.DATE, noviTermin:DataTypes.DATE, napomena:DataTypes.STRING(500) }, {freezeTableName:true,tableName:'historija_termina'}),
+  Pregovor: sequelize.define('Pregovor', { id:{type:DataTypes.INTEGER,autoIncrement:true,primaryKey:true}, status:{type:DataTypes.ENUM('OPEN','ACCEPTED','REJECTED','WITHDRAWN','EXPIRED'),defaultValue:'OPEN'}, isticeAt:DataTypes.DATE }, {freezeTableName:true,tableName:'pregovor'}),
+  StavkaPregovora: sequelize.define('StavkaPregovora', { id:{type:DataTypes.INTEGER,autoIncrement:true,primaryKey:true}, tip:{type:DataTypes.ENUM('OFFER','COUNTER','ACCEPT','REJECT','WITHDRAW'),allowNull:false}, iznos:DataTypes.DECIMAL(12,2), napomena:DataTypes.STRING(1000) }, {freezeTableName:true,tableName:'stavka_pregovora'}),
+  HistorijaCijene: sequelize.define('HistorijaCijene', { id:{type:DataTypes.BIGINT,autoIncrement:true,primaryKey:true}, staraCijena:DataTypes.DECIMAL(12,2), novaCijena:{type:DataTypes.DECIMAL(12,2),allowNull:false}, razlog:{type:DataTypes.STRING(40),allowNull:false} }, {freezeTableName:true,tableName:'historija_cijene',updatedAt:false}),
+  Vodic: sequelize.define('Vodic', { id:{type:DataTypes.INTEGER,autoIncrement:true,primaryKey:true}, slug:{type:DataTypes.STRING(180),allowNull:false}, naslov:{type:DataTypes.STRING(200),allowNull:false}, sazetak:{type:DataTypes.STRING(500),allowNull:false}, sadrzaj:{type:DataTypes.TEXT('long'),allowNull:false}, status:{type:DataTypes.ENUM('DRAFT','PUBLISHED'),defaultValue:'DRAFT'}, objavljenoAt:DataTypes.DATE }, {freezeTableName:true,tableName:'vodic'}),
 });

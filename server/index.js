@@ -3,6 +3,8 @@ const MySQLStore = require('express-mysql-session')(session);
 const { sequelize } = require('./models');
 const config = require('./config/env');
 const { createApp } = require('./app');
+const { logger } = require('./utils/observability');
+const { startJobs } = require('./utils/jobs');
 
 const PORT = config.server.port;
 const sessionStore = new MySQLStore({
@@ -21,16 +23,29 @@ const app = createApp({ sessionStore });
 const initializeDatabase = async () => {
   try {
     await sequelize.authenticate();
-    console.log('✅ Konekcija na bazu uspješna!');
+    logger.info('database_connected');
   } catch (err) {
-    console.error('❌ Greška pri inicijalizaciji baze:', err);
+    logger.fatal({ err }, 'database_initialization_failed');
     process.exit(1);
   }
 };
 
 initializeDatabase().then(() => {
-  app.listen(PORT, () => {
-    console.log(`🚀 Server pokrenut na http://localhost:${PORT}`);
-    console.log(`📊 Environment: ${config.server.nodeEnv}`);
-  });
+  const server = app.listen(PORT, () => logger.info({ port: PORT, environment: config.server.nodeEnv }, 'server_started'));
+  const stopJobs=startJobs();
+  let shuttingDown = false;
+  const shutdown = signal => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    logger.info({ signal }, 'graceful_shutdown_started');
+    stopJobs();
+    server.close(async error => {
+      if (error) logger.error({ err: error }, 'http_shutdown_failed');
+      await sequelize.close().catch(err => logger.error({ err }, 'database_shutdown_failed'));
+      process.exit(error ? 1 : 0);
+    });
+    setTimeout(() => process.exit(1), 15000).unref();
+  };
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
 });

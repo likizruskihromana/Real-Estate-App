@@ -17,7 +17,17 @@ services:
       retries: 12
 
   app:
-    build: .
+    image: ${APP_IMAGE:-domus-app:latest}
+    build:
+      context: .
+      args:
+        VITE_SENTRY_DSN: ${SENTRY_DSN:-}
+        VITE_APP_RELEASE: ${APP_RELEASE:-local}
+        VITE_POSTHOG_KEY: ${POSTHOG_KEY:-}
+        VITE_POSTHOG_HOST: ${POSTHOG_HOST:-https://eu.i.posthog.com}
+        SENTRY_AUTH_TOKEN: ${SENTRY_AUTH_TOKEN:-}
+        SENTRY_ORG: ${SENTRY_ORG:-}
+        SENTRY_PROJECT: ${SENTRY_PROJECT:-}
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -35,6 +45,13 @@ services:
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       SMTP_FROM: ${SMTP_FROM:?Postavite SMTP_FROM}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      APP_RELEASE: ${APP_RELEASE:-local}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      BETA_PUBLISHING_REQUIRED: ${BETA_PUBLISHING_REQUIRED:-true}
+      BETA_MAX_PUBLISHED_PER_OWNER: ${BETA_MAX_PUBLISHED_PER_OWNER:-20}
+      POSTHOG_KEY: ${POSTHOG_KEY:-}
+      POSTHOG_HOST: ${POSTHOG_HOST:-https://eu.i.posthog.com}
     depends_on:
       mysql:
         condition: service_healthy
@@ -43,11 +60,15 @@ services:
     networks: [domus_private]
     command: ["sh", "-c", "npm run migrate && node server/index.js"]
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health/ready',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
       interval: 20s
       timeout: 5s
       retries: 5
       start_period: 30s
+    stop_grace_period: 20s
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
 
   caddy:
     image: caddy:2.10-alpine
@@ -66,6 +87,9 @@ services:
       app:
         condition: service_healthy
     networks: [domus_private]
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
 
 volumes:
   mysql_data:

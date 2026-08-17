@@ -16,9 +16,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     if (!query.data?.korisnik) return;
     const source = new EventSource('/api/v2/obavijesti/stream', { withCredentials: true });
-    source.addEventListener('notification', () => client.invalidateQueries({ queryKey: ['notifications'] }));
+    const refreshLiveData = () => {
+      client.invalidateQueries({ queryKey: ['notifications'] });
+      client.invalidateQueries({ queryKey: ['conversations'] });
+      client.invalidateQueries({ queryKey: ['conversation'] });
+    };
+    source.addEventListener('notification', refreshLiveData);
     let fallback: number | undefined;
-    source.onerror = () => { source.close(); if (!fallback) fallback = window.setInterval(() => client.invalidateQueries({ queryKey: ['notifications'] }), 30_000); };
+    source.onerror = () => { source.close(); if (!fallback) fallback = window.setInterval(refreshLiveData, 30_000); };
     return () => { source.close(); if (fallback) window.clearInterval(fallback); };
   }, [client, query.data?.korisnik]);
   return <AuthContext.Provider value={{ user: query.data?.korisnik ?? null, loading: query.isLoading }}>{children}</AuthContext.Provider>;

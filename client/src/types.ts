@@ -12,6 +12,8 @@ export interface Slika {
   largeUrl?: string;
   sirina?: number;
   visina?: number;
+  redoslijed?: number;
+  objavljena?: boolean;
 }
 
 export interface Nekretnina {
@@ -66,7 +68,12 @@ export interface SessionUser {
   email?: string;
   emailVerified?: boolean;
   systemRole: SystemRole;
+  betaPublishingEnabled?: boolean;
 }
+
+export interface ListingDraftData extends Partial<Nekretnina> { punaAdresa?:string; latTacno?:number; lngTacno?:number; brojSpratova?:number; }
+export interface ListingRevision { id:number; podaci:ListingDraftData; status:'DRAFT'|'PENDING_REVIEW'|'APPROVED'|'CHANGES_REQUESTED'|'REJECTED'; verzija:number; dovrseniKorak:number; razlogOdluke?:string; updatedAt:string; }
+export interface ListingEditorPayload { listing:Pick<Nekretnina,'id'|'slug'|'status'> & {ObjavljenaRevizijaId?:number}; draft:ListingRevision; images:Slika[]; history:Array<Pick<ListingRevision,'id'|'status'|'verzija'|'dovrseniKorak'|'razlogOdluke'|'updatedAt'>>; publishingAllowed:boolean; }
 
 export interface Conversation {
   id: number;

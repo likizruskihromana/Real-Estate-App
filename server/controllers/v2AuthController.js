@@ -6,7 +6,7 @@ const config = require('../config/env');
 const { sendSecurityEmail } = require('../utils/mailer');
 
 const hashToken = (token) => crypto.createHash('sha256').update(token).digest('hex');
-const safeUser = (u) => ({ id:u.id, ime:u.ime, prezime:u.prezime, username:u.username, email:u.email, emailVerified:!!u.emailVerifiedAt, systemRole:u.systemRole || (u.admin?'SUPER_ADMIN':'USER') });
+const safeUser = (u) => ({ id:u.id, ime:u.ime, prezime:u.prezime, username:u.username, email:u.email, emailVerified:!!u.emailVerifiedAt, systemRole:u.systemRole || (u.admin?'SUPER_ADMIN':'USER'), betaPublishingEnabled:!!u.betaPublishingEnabledAt });
 const regenerate = (req) => new Promise((resolve,reject)=>req.session.regenerate(e=>e?reject(e):resolve()));
 function setSession(req,u){req.session.userId=u.id;req.session.username=u.username;req.session.admin=u.admin||u.systemRole==='SUPER_ADMIN';req.session.systemRole=u.systemRole||'USER';}
 async function activity(tip,userId,metadata={}){await ActivityEvent.create({tip,ActorId:userId,metadata}).catch(()=>{});}

@@ -38,6 +38,8 @@ module.exports = (sequelize) => {
     energetskaKlasa: { type: DataTypes.STRING(10), allowNull: true },
     dostupnoOd: { type: DataTypes.DATEONLY, allowNull: true },
     pogodnosti: { type: DataTypes.JSON, allowNull: true },
+    ObjavljenaRevizijaId: { type: DataTypes.INTEGER, allowNull: true },
+    AktivnaDraftRevizijaId: { type: DataTypes.INTEGER, allowNull: true },
   }, {
     freezeTableName: true,
     tableName: 'nekretnina',

@@ -6,10 +6,16 @@ const config = require('./config/env');
 const { csrfProtection } = require('./middleware/csrf');
 const { requestContext, apiNotFound, errorHandler } = require('./middleware/errors');
 const { installSeoRoutes } = require('./utils/seoRoutes');
+const { sequelize } = require('./models');
 
 function createApp({ sessionStore, serveStatic = true } = {}) {
   const app = express();
   app.use(requestContext);
+  app.get('/health', (req, res) => res.json({ status: 'ok' }));
+  app.get('/health/ready', async (req, res) => {
+    try { await sequelize.authenticate(); res.json({ status: 'ready' }); }
+    catch { res.status(503).json({ status: 'unavailable' }); }
+  });
   app.use(session({
     ...(sessionStore ? { store: sessionStore } : {}),
     secret: config.session.secret,
@@ -31,7 +37,7 @@ function createApp({ sessionStore, serveStatic = true } = {}) {
     res.setHeader('X-Frame-Options', 'SAMEORIGIN');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.tile.openstreetmap.org; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'");
+    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.tile.openstreetmap.org; connect-src 'self' https://*.ingest.sentry.io https://eu.i.posthog.com https://eu-assets.i.posthog.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'");
     next();
   });
 

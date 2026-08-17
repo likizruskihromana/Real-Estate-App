@@ -24,7 +24,7 @@ const OmiljenaNekretnina = require('./OmiljenaNekretnina')(sequelize);
 const SacuvanaPretraga = require('./SacuvanaPretraga')(sequelize);
 const PodudaranjeSacuvanePretrage = require('./PodudaranjeSacuvanePretrage')(sequelize);
 const v2 = require('./DomusV2')(sequelize);
-const { Organizacija, ClanstvoOrganizacije, Razgovor, Poruka, TerminPregleda, PregovarackaPonuda, JavniFaq, Obavijest, ActivityEvent, AdminAuditLog, PrijavaSadrzaja, OglasRevizija } = v2;
+const { Organizacija, ClanstvoOrganizacije, Razgovor, Poruka, TerminPregleda, PregovarackaPonuda, JavniFaq, Obavijest, ActivityEvent, AdminAuditLog, PrijavaSadrzaja, OglasRevizija, PozivOrganizacije, DokumentVerifikacije, BetaFeedback, HistorijaTermina, Pregovor, StavkaPregovora, HistorijaCijene, Vodic } = v2;
 
 // Veze
 Korisnik.hasMany(Nekretnina);
@@ -62,6 +62,7 @@ Nekretnina.belongsTo(Korisnik, { as: 'Kupac', foreignKey: 'kupacId' });
 
 Nekretnina.hasMany(SlikaNekretnine, { as: 'Slike', foreignKey: 'NekretninaId', onDelete: 'CASCADE' });
 SlikaNekretnine.belongsTo(Nekretnina, { foreignKey: 'NekretninaId' });
+SlikaNekretnine.belongsTo(OglasRevizija, { foreignKey: 'OglasRevizijaId' });
 
 Korisnik.belongsToMany(Nekretnina, {
   through: OmiljenaNekretnina,
@@ -117,6 +118,26 @@ PrijavaSadrzaja.belongsTo(Korisnik, { as: 'Prijavio', foreignKey: 'PrijavioId' }
 OglasRevizija.belongsTo(Nekretnina, { foreignKey: 'NekretninaId' });
 OglasRevizija.belongsTo(Korisnik, { as: 'Autor', foreignKey: 'AutorId' });
 OglasRevizija.belongsTo(Korisnik, { as: 'Pregledao', foreignKey: 'PregledaoId' });
+OglasRevizija.hasMany(SlikaNekretnine, { as: 'SlikeRevizije', foreignKey: 'OglasRevizijaId' });
+OglasRevizija.belongsTo(OglasRevizija, { as: 'BaznaRevizija', foreignKey: 'BaznaRevizijaId' });
+PozivOrganizacije.belongsTo(Organizacija, { foreignKey: 'OrganizacijaId' });
+PozivOrganizacije.belongsTo(Korisnik, { as: 'Pozvao', foreignKey: 'PozvaoId' });
+PozivOrganizacije.belongsTo(Korisnik, { as: 'Prihvatio', foreignKey: 'PrihvatioId' });
+DokumentVerifikacije.belongsTo(Organizacija, { foreignKey: 'OrganizacijaId' });
+DokumentVerifikacije.belongsTo(Korisnik, { as: 'Postavio', foreignKey: 'PostavioId' });
+BetaFeedback.belongsTo(Korisnik, { foreignKey: 'KorisnikId' });
+BetaFeedback.belongsTo(Nekretnina, { foreignKey: 'NekretninaId' });
+HistorijaTermina.belongsTo(TerminPregleda, { foreignKey: 'TerminPregledaId' });
+HistorijaTermina.belongsTo(Korisnik, { as: 'Actor', foreignKey: 'ActorId' });
+TerminPregleda.hasMany(HistorijaTermina, { as: 'Historija', foreignKey: 'TerminPregledaId' });
+Pregovor.belongsTo(Nekretnina, { foreignKey: 'NekretninaId' });
+Pregovor.belongsTo(Korisnik, { as: 'Pokretac', foreignKey: 'PokretacId' });
+Pregovor.belongsTo(Korisnik, { as: 'Primaoc', foreignKey: 'PrimaocId' });
+Pregovor.hasMany(StavkaPregovora, { as: 'Stavke', foreignKey: 'PregovorId' });
+StavkaPregovora.belongsTo(Pregovor, { foreignKey: 'PregovorId' });
+StavkaPregovora.belongsTo(Korisnik, { as: 'Autor', foreignKey: 'AutorId' });
+HistorijaCijene.belongsTo(Nekretnina, { foreignKey: 'NekretninaId' });
+Vodic.belongsTo(Korisnik, { as: 'Autor', foreignKey: 'AutorId' });
 
 Nekretnina.prototype.getInteresovanja = async function () {
   const [upiti, zahtjevi, ponude] = await Promise.all([
@@ -132,5 +153,6 @@ module.exports = {
   SlikaNekretnine, OmiljenaNekretnina, SacuvanaPretraga, PodudaranjeSacuvanePretrage,
   Organizacija, ClanstvoOrganizacije, Razgovor, Poruka, TerminPregleda,
   PregovarackaPonuda, JavniFaq, Obavijest, ActivityEvent, AdminAuditLog,
-  PrijavaSadrzaja, OglasRevizija,
+  PrijavaSadrzaja, OglasRevizija, PozivOrganizacije, DokumentVerifikacije,
+  BetaFeedback, HistorijaTermina, Pregovor, StavkaPregovora, HistorijaCijene, Vodic,
 };

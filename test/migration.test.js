@@ -6,6 +6,7 @@ const savedMigration = require('../server/migrations/003-saved-items');
 const domusV2Migration = require('../server/migrations/004-domus-v2');
 const growthMigration = require('../server/migrations/005-growth-ux');
 const slugMigration = require('../server/migrations/006-public-slugs');
+const marketplaceMigration = require('../server/migrations/007-marketplace-operations');
 
 test('početna migracija odbija djelimično postojeću šemu', async () => {
   const queryInterface = { showAllTables: async () => ['korisnik'] };
@@ -95,4 +96,24 @@ test('slug migracija popunjava stabilne javne identifikatore', async () => {
   const updates=[];const queryInterface={bulkUpdate:async(_table,values,where)=>updates.push({values,where})};const sequelize={query:async()=>[[{id:7,naziv:'Četverosoban stan — Centar'}]]};
   await slugMigration.up({queryInterface,sequelize,transaction:{}});
   assert.deepEqual(updates,[{values:{slug:'cetverosoban-stan-centar-7'},where:{id:7}}]);
+});
+
+test('Marketplace operations migracija je forward-only i zadržava postojeće podatke', async () => {
+  const added=[];const created=[];const indexes=[];
+  const queryInterface={
+    describeTable:async()=>({}),
+    showAllTables:async()=>['korisnik','organizacija','nekretnina','oglas_revizija','slika_nekretnine','poruka_v2','razgovor','javni_faq'],
+    addColumn:async(table,column)=>added.push(`${table}.${column}`),
+    changeColumn:async()=>{},
+    createTable:async name=>created.push(name),
+    addIndex:async(table,_columns,options)=>indexes.push(`${table}.${options.name}`),
+  };
+  await marketplaceMigration.up({queryInterface,transaction:{}});
+  assert.ok(added.includes('korisnik.betaPublishingEnabledAt'));
+  assert.ok(added.includes('oglas_revizija.verzija'));
+  assert.ok(added.includes('slika_nekretnine.OglasRevizijaId'));
+  assert.ok(created.includes('beta_feedback'));
+  assert.ok(created.includes('pregovor'));
+  assert.ok(created.includes('vodic'));
+  assert.ok(indexes.includes('isporuceni_podsjetnik.podsjetnik_termin_vrsta_uq'));
 });

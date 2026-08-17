@@ -14,6 +14,8 @@ module.exports = (sequelize) => sequelize.define('SlikaNekretnine', {
   visina: { type: DataTypes.INTEGER.UNSIGNED, allowNull: true },
   glavna: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
   redoslijed: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false, defaultValue: 0 },
+  OglasRevizijaId: { type: DataTypes.INTEGER, allowNull: true },
+  objavljena: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
 }, {
   freezeTableName: true,
   tableName: 'slika_nekretnine',

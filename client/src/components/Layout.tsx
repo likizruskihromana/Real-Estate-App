@@ -2,6 +2,7 @@ import { Bell, Building2, Heart, Menu, UserRound, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import { BetaTools } from './BetaTools';
 
 export function Layout() {
   const [open, setOpen] = useState(false);
@@ -22,6 +23,7 @@ export function Layout() {
           <nav className={open ? 'main-nav is-open' : 'main-nav'} onClick={() => setOpen(false)}>
             <NavLink to="/nekretnine">Nekretnine</NavLink>
             <NavLink to="/agencije">Agencije</NavLink>
+            <NavLink to="/uporedi">Uporedi</NavLink>
             {user && <NavLink to="/inbox">Inbox</NavLink>}
             {user && <NavLink to="/moji-oglasi">Moji oglasi</NavLink>}
             {admin && <NavLink to="/admin">Admin centar</NavLink>}
@@ -47,6 +49,7 @@ export function Layout() {
           <div><strong>Podrška</strong><span>Sigurna komunikacija</span><span>Provjereni oglasi</span><span>Privatnost lokacije</span></div>
         </div>
       </footer>
+      <BetaTools />
     </div>
   );
 }
