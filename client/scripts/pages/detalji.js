@@ -6,6 +6,11 @@ window.addEventListener('DOMContentLoaded', () => {
     const nekretninaId = urlParams.get('id') || 1;
 
     loadNekretninaDetalji(nekretninaId);
+
+    document.getElementById('kontakt-dugme')?.addEventListener('click', () => {
+        document.getElementById('forma-interesovanje')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        document.getElementById('input-tekst')?.focus({ preventScroll: true });
+    });
 });
 
 function toggleFormaOdgovora(komentarId) {
@@ -40,21 +45,25 @@ async function loadNekretninaDetalji(id) {
 function displayOsnovniPodaci(nekretnina) {
     const e = Helpers.escapeHtml;
     document.getElementById('osnovno').innerHTML = `
-        <h1><strong> ${e(nekretnina.naziv)}</strong> ${nekretnina.kupljeno ? '<span class="oznaka-prodano">PRODANO</span>' : ''}</h1>
-        <p><strong>Kvadratura:</strong> ${nekretnina.kvadratura} m²</p>
-        <p><strong>Cijena:</strong> ${Helpers.formatPrice(nekretnina.cijena)}</p>
+        <p class="property-type">${e(nekretnina.tip_nekretnine)}</p>
+        <h1>${e(nekretnina.naziv)} ${nekretnina.kupljeno ? '<span class="oznaka-prodano">PRODANO</span>' : ''}</h1>
+        <p class="summary-location">${e(nekretnina.lokacija)}</p>
+        <p class="summary-price">${Helpers.formatPrice(nekretnina.cijena)}</p>
+        <div class="summary-facts"><span>${nekretnina.kvadratura} m²</span><span>${e(nekretnina.tip_grijanja || 'Grijanje n/a')}</span><span>${nekretnina.godina_izgradnje || 'Godina n/a'}</span></div>
         ${nekretnina.kupljeno ? `<p class="napomena-prodano">Prodano ${Helpers.formatDate(nekretnina.datumKupovine)} za ${Helpers.formatPrice(nekretnina.prodajnaCijena)}.</p>` : ''}
     `;
+
+    document.title = `${e(nekretnina.naziv)} — Domus`;
 }
 
 function displayDetalji(nekretnina) {
     const e = Helpers.escapeHtml;
     document.getElementById('detalji').innerHTML = `
-        <p><strong>Tip grijanja: </strong> ${e(nekretnina.tip_grijanja)}</p>
-        <p><strong>Lokacija: </strong> ${e(nekretnina.lokacija)}</p>
-        <p><strong>Godina izgradnje: </strong> ${nekretnina.godina_izgradnje}</p>
-        <p><strong>Datum objave: </strong> ${Helpers.formatDate(nekretnina.datum_objave)}</p>
-        <p><strong>Opis: </strong> ${e(nekretnina.opis)}</p>
+        <p><strong>Tip grijanja</strong>${e(nekretnina.tip_grijanja || 'Nije navedeno')}</p>
+        <p><strong>Lokacija</strong>${e(nekretnina.lokacija)}</p>
+        <p><strong>Godina izgradnje</strong>${nekretnina.godina_izgradnje || 'Nije navedena'}</p>
+        <p><strong>Datum objave</strong>${Helpers.formatDate(nekretnina.datum_objave)}</p>
+        <p class="opis-stavka"><strong>Opis</strong>${e(nekretnina.opis || 'Opis nekretnine nije unesen.')}</p>
     `;
 }
 

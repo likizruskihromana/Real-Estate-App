@@ -3,26 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nekretnine - Početna</title>
+    <meta name="description" content="Domus je moderan portal za provjerene nekretnine u Bosni i Hercegovini.">
+    <title>Domus — Nekretnine po vašoj mjeri</title>
+    <link rel="stylesheet" href="../style/site.css">
     <link rel="stylesheet" href="../style/main.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
-    <iframe src="/meni.html"></iframe>
-    
-    <div class="hero">
-        <h1>Dobrodošli na Portal Nekretnina</h1>
-        <p>Pronađite savršenu nekretninu za vas</p>
-        <button><a href="ponude.html" target="_top" id="ponudeLink">
-                <i class="fa fa-newspaper-o"></i>
-                <span>Najnovije ponude</span>
-            </a></button>
-        <button><a href="prijava.html" target="_top" id="prijavaLink">
-                <i class="fa fa-sign-in"></i>
-                <span>Prijavi se</span>
-            </a></button>
-    </div>
-
+    <header id="site-header"></header>
+    <main>
+        <section class="hero" aria-labelledby="hero-title">
+            <div class="hero__content shell">
+                <p class="eyebrow">Nekretnine u Bosni i Hercegovini</p>
+                <h1 id="hero-title">Prostor za život koji vam zaista pripada.</h1>
+                <p class="hero__lead">Pregledajte pažljivo predstavljene stanove, kuće i poslovne prostore — jednostavno, jasno i bez nepotrebnog lutanja.</p>
+                <form class="property-search" id="pocetna-pretraga" role="search">
+                    <label class="search-field"><span>Lokacija</span><input id="search-lokacija" name="lokacija" type="search" placeholder="Sarajevo, Mostar, Tuzla…"></label>
+                    <label class="search-field"><span>Vrsta nekretnine</span><select id="search-tip" name="tip"><option value="">Sve nekretnine</option><option value="Stan">Stan</option><option value="Kuća">Kuća</option><option value="Poslovni prostor">Poslovni prostor</option></select></label>
+                    <label class="search-field"><span>Najviša cijena</span><select id="search-cijena" name="cijena"><option value="">Bez ograničenja</option><option value="100000">do 100.000 KM</option><option value="200000">do 200.000 KM</option><option value="350000">do 350.000 KM</option><option value="500000">do 500.000 KM</option></select></label>
+                    <button class="button button--accent search-submit" type="submit">Pretraži nekretnine</button>
+                </form>
+                <div class="hero__trust" aria-label="Prednosti portala"><span>Jasni podaci</span><span>Direktan kontakt</span><span>Sigurniji proces</span></div>
+            </div>
+        </section>
+        <section class="home-section shell" aria-labelledby="izdvojeno-naslov">
+            <div class="section-heading"><div><p class="eyebrow">Izdvojena ponuda</p><h2 id="izdvojeno-naslov">Nove prilike na tržištu</h2></div><a class="text-link" href="nekretnine.html">Pogledaj sve <span aria-hidden="true">→</span></a></div>
+            <div id="izdvojene-nekretnine" class="featured-grid" aria-live="polite"><p class="loading-copy">Učitavamo najnovije nekretnine…</p></div>
+        </section>
+        <section class="home-section home-section--soft">
+            <div class="shell confidence-grid">
+                <div class="confidence-copy"><p class="eyebrow">Pametnija odluka</p><h2>Sve važne informacije na jednom mjestu.</h2><p>Od prve pretrage do dogovora s vlasnikom, Domus pojednostavljuje svaki korak i stavlja preglednost na prvo mjesto.</p><a class="button button--dark" href="registracija.html">Kreiraj besplatan profil</a></div>
+                <div class="benefit-list">
+                    <article><strong>01</strong><div><h3>Precizna pretraga</h3><p>Brzo suzite izbor prema lokaciji, vrsti i budžetu.</p></div></article>
+                    <article><strong>02</strong><div><h3>Detaljni oglasi</h3><p>Uporedite cijenu, kvadraturu, grijanje i godinu izgradnje.</p></div></article>
+                    <article><strong>03</strong><div><h3>Direktno interesovanje</h3><p>Pošaljite upit, zahtjev za pregled ili ponudu iz samog oglasa.</p></div></article>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="site-footer"><div class="shell site-footer__inner"><a class="brand brand--footer" href="index.html"><span class="brand__mark">D</span><span>Domus</span></a><p>Pronađite mjesto kojem ćete se rado vraćati.</p><p>© 2026 Domus</p></div></footer>
+    <script src="../scripts/utils/helpers.js"></script>
     <script src="../scripts/api/PoziviAjax.js"></script>
+    <script src="../scripts/components/siteHeader.js"></script>
+    <script src="../scripts/pages/index.js"></script>
 </body>
 </html>

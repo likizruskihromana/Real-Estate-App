@@ -3,96 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nekretnine</title>
+    <meta name="description" content="Pretražite dostupne stanove, kuće i poslovne prostore na Domus portalu.">
+    <title>Nekretnine — Domus</title>
+    <link rel="stylesheet" href="../style/site.css">
     <link rel="stylesheet" href="../style/nekretnine.css">
 </head>
 <body>
-    <iframe src="/meni.html"></iframe>
-
-    <div class="akcije-vrh">
-        <button id="dodaj-nekretninu-dugme" type="button" class="dugme-dodaj">+ Dodaj nekretninu</button>
-    </div>
-
-    <div class="tip-nekretnine" id="stan">
-        <h1>Stan</h1>
-        <div class="grid-lista-nekretnina" id="stan-lista"></div>
-    </div>
-
-    <div class="tip-nekretnine" id="kuca">
-        <h1>Kuća</h1>
-        <div class="grid-lista-nekretnina" id="kuca-lista"></div>
-    </div>
-
-    <div class="tip-nekretnine" id="pp">
-        <h1>Poslovni prostor</h1>
-        <div class="grid-lista-nekretnina" id="pp-lista"></div>
-    </div>
-
-    <div id="modal-overlay" class="modal-overlay skriven">
-        <div class="modal-box">
-            <div class="modal-header">
-                <h2 id="modal-naslov">Dodaj novu nekretninu</h2>
-                <button type="button" id="modal-zatvori" class="modal-zatvori">&times;</button>
+    <header id="site-header"></header>
+    <main>
+        <section class="catalog-hero">
+            <div class="shell catalog-hero__inner">
+                <div><p class="eyebrow">Aktuelna ponuda</p><h1>Pronađite svoj sljedeći prostor.</h1><p>Pregledajte dostupne nekretnine i suzite izbor prema onome što vam je zaista važno.</p></div>
+                <button id="dodaj-nekretninu-dugme" type="button" class="button button--accent">+ Objavi nekretninu</button>
             </div>
+        </section>
 
-            <div id="modal-poruka" class="forma-poruka" style="display:none;"></div>
+        <section class="catalog shell">
+            <form id="filter-forma" class="catalog-filters" role="search">
+                <div class="filter-field filter-field--wide"><label for="filter-lokacija">Lokacija ili naziv</label><input id="filter-lokacija" type="search" placeholder="npr. Sarajevo"></div>
+                <div class="filter-field"><label for="filter-tip">Vrsta</label><select id="filter-tip"><option value="">Sve vrste</option><option value="Stan">Stan</option><option value="Kuća">Kuća</option><option value="Poslovni prostor">Poslovni prostor</option></select></div>
+                <div class="filter-field"><label for="filter-cijena">Cijena do</label><input id="filter-cijena" type="number" min="0" step="10000" placeholder="Bez ograničenja"></div>
+                <button type="submit" class="button button--dark">Primijeni</button>
+                <button type="button" id="ponisti-filtere" class="button button--ghost">Poništi</button>
+            </form>
+            <div class="catalog-toolbar"><div><p class="eyebrow">Rezultati</p><h2 id="rezultati-naslov">Dostupne nekretnine</h2></div><label class="sort-control">Poredaj<select id="sortiranje"><option value="najnovije">Najnovije</option><option value="cijena-asc">Cijena: niža prvo</option><option value="cijena-desc">Cijena: viša prvo</option><option value="kvadratura-desc">Najveća kvadratura</option></select></label></div>
+            <div id="lista-nekretnina" class="catalog-grid" aria-live="polite"><p class="catalog-message">Učitavamo nekretnine…</p></div>
+        </section>
+    </main>
 
+    <div id="modal-overlay" class="modal-overlay skriven" role="dialog" aria-modal="true" aria-labelledby="modal-naslov">
+        <div class="modal-box">
+            <div class="modal-header"><h2 id="modal-naslov">Dodaj novu nekretninu</h2><button type="button" id="modal-zatvori" class="modal-zatvori" aria-label="Zatvori">&times;</button></div>
+            <div id="modal-poruka" class="forma-poruka" hidden></div>
             <form id="nekretnina-forma">
                 <input type="hidden" id="nekretnina-id">
-
-                <div class="form-group">
-                    <label for="f-tip">Tip nekretnine</label>
-                    <select id="f-tip" required>
-                        <option value="Stan">Stan</option>
-                        <option value="Kuća">Kuća</option>
-                        <option value="Poslovni prostor">Poslovni prostor</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="f-naziv">Naziv</label>
-                    <input type="text" id="f-naziv" required>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="f-kvadratura">Kvadratura (m²)</label>
-                        <input type="number" id="f-kvadratura" min="1" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="f-cijena">Cijena (KM)</label>
-                        <input type="number" id="f-cijena" min="1" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="f-lokacija">Lokacija</label>
-                        <input type="text" id="f-lokacija" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="f-grijanje">Tip grijanja</label>
-                        <input type="text" id="f-grijanje" placeholder="npr. centralno">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="f-godina">Godina izgradnje</label>
-                    <input type="number" id="f-godina" min="1800">
-                </div>
-
-                <div class="form-group">
-                    <label for="f-opis">Opis</label>
-                    <textarea id="f-opis" rows="3"></textarea>
-                </div>
-
-                <button type="submit" id="nekretnina-sacuvaj-dugme" class="dugme-dodaj">Sačuvaj</button>
+                <div class="form-group"><label for="f-tip">Tip nekretnine</label><select id="f-tip" required><option value="Stan">Stan</option><option value="Kuća">Kuća</option><option value="Poslovni prostor">Poslovni prostor</option></select></div>
+                <div class="form-group"><label for="f-naziv">Naziv</label><input type="text" id="f-naziv" required maxlength="150"></div>
+                <div class="form-row"><div class="form-group"><label for="f-kvadratura">Kvadratura (m²)</label><input type="number" id="f-kvadratura" min="1" required></div><div class="form-group"><label for="f-cijena">Cijena (KM)</label><input type="number" id="f-cijena" min="1" required></div></div>
+                <div class="form-row"><div class="form-group"><label for="f-lokacija">Lokacija</label><input type="text" id="f-lokacija" required></div><div class="form-group"><label for="f-grijanje">Tip grijanja</label><input type="text" id="f-grijanje" placeholder="npr. centralno"></div></div>
+                <div class="form-group"><label for="f-godina">Godina izgradnje</label><input type="number" id="f-godina" min="1800"></div>
+                <div class="form-group"><label for="f-opis">Opis</label><textarea id="f-opis" rows="4"></textarea></div>
+                <button type="submit" id="nekretnina-sacuvaj-dugme" class="button button--dark button--full">Sačuvaj nekretninu</button>
             </form>
         </div>
     </div>
-
-    <script src="../scripts/utils/helpers.js"></script>
-    <script src="../scripts/api/PoziviAjax.js"></script>
-    <script src="../scripts/pages/nekretnine.js"></script>
+    <footer class="site-footer"><div class="shell site-footer__inner"><a class="brand brand--footer" href="index.html"><span class="brand__mark">D</span><span>Domus</span></a><p>Pronađite mjesto kojem ćete se rado vraćati.</p><p>© 2026 Domus</p></div></footer>
+    <script src="../scripts/utils/helpers.js"></script><script src="../scripts/api/PoziviAjax.js"></script><script src="../scripts/components/siteHeader.js"></script><script src="../scripts/pages/nekretnine.js"></script>
 </body>
 </html>
