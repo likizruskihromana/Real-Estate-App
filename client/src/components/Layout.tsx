@@ -1,13 +1,16 @@
-import { Bell, Building2, Heart, Menu, UserRound, X } from 'lucide-react';
+import { Bell, Building2, Heart, LogOut, Menu, UserRound, X } from 'lucide-react';
 import { useState } from 'react';
-import { Link, NavLink, Outlet } from 'react-router-dom';
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { BetaTools } from './BetaTools';
 
 export function Layout() {
   const [open, setOpen] = useState(false);
-  const { user } = useAuth();
+  const [logoutError, setLogoutError] = useState(false);
+  const { user, logout, loggingOut } = useAuth();
+  const navigate = useNavigate();
   const admin = user && user.systemRole !== 'USER';
+  const signOut = async () => { try { setLogoutError(false); await logout(); setOpen(false); navigate('/', { replace: true }); } catch { setLogoutError(true); } };
 
   return (
     <div className="app-shell">
@@ -34,6 +37,7 @@ export function Layout() {
                 <Link className="icon-button" to="/sacuvano" aria-label="Sačuvano"><Heart size={19} /></Link>
                 <Link className="icon-button notification-button" to="/obavijesti" aria-label="Obavijesti"><Bell size={19} /><span /></Link>
                 <Link className="user-chip" to="/profil"><UserRound size={18} /><span>{user.ime}</span></Link>
+                <button className="logout-button" type="button" onClick={signOut} disabled={loggingOut} aria-label={logoutError ? 'Odjava nije uspjela, pokušaj ponovo' : 'Odjavi se'}><LogOut size={18} /><span>{loggingOut ? 'Odjavljujem…' : logoutError ? 'Pokušaj ponovo' : 'Odjavi se'}</span></button>
               </>
             ) : (
               <><Link className="link-button" to="/prijava">Prijavi se</Link><Link className="button small" to="/registracija">Registruj se</Link></>

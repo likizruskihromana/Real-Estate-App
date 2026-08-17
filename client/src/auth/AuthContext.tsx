@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect, type PropsWithChildren } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import type { SessionUser } from '../types';
 
-type AuthState = { user: SessionUser | null; loading: boolean };
-const AuthContext = createContext<AuthState>({ user: null, loading: true });
+type AuthState = { user: SessionUser | null; loading: boolean; loggingOut: boolean; logout: () => Promise<void> };
+const AuthContext = createContext<AuthState>({ user: null, loading: true, loggingOut: false, logout: async () => {} });
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const client = useQueryClient();
@@ -12,6 +12,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
     queryKey: ['session'],
     queryFn: () => api<{ korisnik: SessionUser | null }>('/api/v2/auth/session'),
     retry: false,
+  });
+  const logoutMutation = useMutation({
+    mutationFn: () => api<void>('/api/v2/auth/logout', { method: 'POST' }),
+    onSuccess: async () => {
+      await client.cancelQueries();
+      client.clear();
+      client.setQueryData(['session'], { korisnik: null });
+    },
   });
   useEffect(() => {
     if (!query.data?.korisnik) return;
@@ -26,7 +34,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     source.onerror = () => { source.close(); if (!fallback) fallback = window.setInterval(refreshLiveData, 30_000); };
     return () => { source.close(); if (fallback) window.clearInterval(fallback); };
   }, [client, query.data?.korisnik]);
-  return <AuthContext.Provider value={{ user: query.data?.korisnik ?? null, loading: query.isLoading }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user: query.data?.korisnik ?? null, loading: query.isLoading, loggingOut: logoutMutation.isPending, logout: logoutMutation.mutateAsync }}>{children}</AuthContext.Provider>;
 }
 
 export const useAuth = () => useContext(AuthContext);
